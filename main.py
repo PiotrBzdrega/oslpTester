@@ -1,17 +1,22 @@
 import oslp.protocol as protocol
 import gui
 import server
-
-def p():
-    print("adam")
+from datetime import datetime
+import crypto
 
 if __name__ == "__main__":
-    # OSLitaP = oslp.oslpservice()
     # gui.window(p)
-    # data = bytes([1,2,3])
-    # print(data)
 
+    # integer_value = int.from_bytes(data, byteorder='big', signed=False)
+    # print(integer_value)
+    # x = int(datetime.now().astimezone().utcoffset().total_seconds() / 60)
+    # print(x)
     # size = data[1]<<8
     # print(size)
+    # crypto.signatureTest()
 
-    protocol.message2()
+    # protocol.serializeNotification()
+    # protocol.message2()
+    # protocol.createConfiguration()
+
+    oslpInstance = protocol.protocol()

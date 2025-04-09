@@ -21,4 +21,4 @@ class server:
                 client_socket, client_address = server_socket.accept()
                 print(f"Connection from {client_address}")
                 self.handler(client_socket)
-                print("Close the connection2") 
+                print("Server waits for the next request") 

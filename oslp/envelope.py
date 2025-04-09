@@ -20,16 +20,27 @@ class envelope:
         else:
             self.securityKey = securityKey
 
-    # def validata(self,public):
+    def dataToSign(self) -> bytes:
+        serialize_payload = self.payload.SerializeToString()
+        payload_len = len(serialize_payload)
+        dataToSign = self.sequenceNumber + self.deviceId + payload_len.to_bytes(length=2, byteorder='big', signed=False) + serialize_payload
+        return dataToSign
 
     def setSecurityKey(self):
-        data = self.sequenceNumber
-        crypto.sign(self.privateKey,)
-        self.securityKey = 0
-        raise NotImplementedError
+        signature = crypto.sign(self.privateKey,self.dataToSign())
+        sign_with_padding = signature + bytes(128-len(signature)) # 128 is signature max length
+        # print("setSecurityKey","sign_with_padding"," ".join(str(byte) for byte in sign_with_padding))
+        self.securityKey = sign_with_padding
     
-    def validate(self,publicKey):
-        raise NotImplementedError
+    def validate(self,publicKey) -> bool:
+        signature_size = 2+self.securityKey[1] # [0] - something, [1] - length
+        signature = self.securityKey[:signature_size]
+        # print("validate","signature1"," ".join(str(byte) for byte in signature))
+        result = crypto.verify(publicKey,self.dataToSign(),signature)
+        return result
+
+    def encode(self) -> bytes:
+        return self.securityKey + self.dataToSign()
 
     @classmethod
     def decodeSecurityKey(cls,data):
@@ -64,27 +75,30 @@ class envelope:
         if not messageValidator(data):
             raise Exception("messageValidator")
         raw_data = bytearray(data)
-        print(len(raw_data))
+        # print(len(raw_data))
         security_key = cls.decodeSecurityKey(raw_data)
-        print(len(raw_data))
+        # print(len(raw_data))
         sequence_number = cls.decodeSequnceNumber(raw_data)
-        print(len(raw_data))
+        # intseq = int.from_bytes(sequence_number, byteorder='big', signed=False)
+        # print("sequence_number received"," ".join(str(byte) for byte in sequence_number))
+        # print("intseq",intseq)
+        # print(len(raw_data))
         device_id = cls.decodeDeviceId(raw_data)
-        print(len(raw_data))
+        # print(len(raw_data))
         payload = cls.decodepayload(raw_data)
         return cls(sequence_number,device_id,payload,securityKey=security_key)
 
 def messageValidator(data):
-    len = len(data)
-    print("enelope size",len)
-    len-=ENVELOPE_FIXED_SIZE
+    data_len = len(data)
+    # print("enelope size",data_len)
+    data_len-=ENVELOPE_FIXED_SIZE
     # envelope must be longer than fixed size part 
-    if len <= 0:
+    if data_len <= 0:
         return False
     
     msg_len = (data[ENVELOPE_FIXED_SIZE-LEN_INDICATOR_SIZE] <<8) + data[ENVELOPE_FIXED_SIZE-LEN_INDICATOR_SIZE+1]
 
-    if len == msg_len:
+    if data_len == msg_len:
         return True
 
     return False
