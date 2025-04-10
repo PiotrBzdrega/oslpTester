@@ -5,16 +5,17 @@ import server
 import oslp.envelope as envelope
 import oslp.message as message
 import oslp.device as device
+import ssl
 import crypto
 import google.protobuf
 import oslp.oslp_pb2 as oslp_pb2 #import the generated protobuf module
 from google.protobuf.json_format import MessageToJson, Parse
 
 class protocol:
-    def __init__(self):
+    def __init__(self,ip: str, port: int, tls: bool):
         self.retrieveKey()
-        self.dev = device.device(crypto.load_key(crypto.TEST_PUBLIC_KEY, public=True))
-        self.server = server.server()
+        self.dev = device.device(crypto.load_key(crypto.PUBLIC_KEY, public=True))
+        self.server = server.server(ip,port,tls)
         self.server.add_handler(handler=self.server_handler)
         self.t1 = threading.Thread(target=self.server.start, name='server_handler')
 
@@ -128,7 +129,7 @@ def message2():
     print("decoded",env2.payload)
     public = privat.public_key()
 
-    # public = crypto.load_key(crypto.TEST_PUBLIC_KEY, public=True)
+    # public = crypto.load_key(crypto.PUBLIC_KEY, public=True)
 
     if env2.validate(public):
         print("validated")

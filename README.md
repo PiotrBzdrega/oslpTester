@@ -14,9 +14,12 @@ python3 --version
 
 git clone ${this repo}
 cd ${repodir}
+sudo apt update
+sudo apt install python3-tk
+sudo apt install python3.12-venv
 python3 -m venv .venv
 source .venv/bin/activate
-pip3 install protobuf=5.29.3
+pip3 install protobuf==5.29.3
 pip3 install cryptography
 ```
 

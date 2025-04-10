@@ -19,4 +19,5 @@ if __name__ == "__main__":
     # protocol.message2()
     # protocol.createConfiguration()
 
-    oslpInstance = protocol.protocol()
+    isTLS = True
+    oslpInstance = protocol.protocol("0.0.0.0",12123,isTLS)
