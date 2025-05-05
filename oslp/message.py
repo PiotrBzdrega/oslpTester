@@ -1,21 +1,46 @@
 import oslp.oslp_pb2 as oslp_pb2 #import the generated protobuf module
 import oslp.device as device
 from datetime import datetime
+from oslp.types import OslpRequestType
 
 # OslpChannelHandlerServer.java channelRead0
 
 # integer_value.to_bytes(length=length, byteorder='big', signed=False)
 
-def handleMessage(device_uid,sequence_number,payload,dev):
-    return processMessage(device_uid,sequence_number,payload,dev)
+def prepareMessageType(type:OslpRequestType):
+    print(f"function: {prepareMessageType.__name__}({type})")
+    msg = oslp_pb2.Message()
+    match type:
+        case OslpRequestType.startSelfTestRequest:
+            print("start_selftest_request")
+        case OslpRequestType.stopSelfTestRequest:
+            print("stop_selftest_request")
+        case OslpRequestType.setLightRequest:
+            print("set_light_request")
+        case OslpRequestType.getStatusRequest:
+            msg.getStatusRequest
+        case OslpRequestType.resumeScheduleRequest:
+            print("resume_schedule_request")
+        case OslpRequestType.setEventNotificationsRequest:
+            print("set_event_notifications_request")
+        case OslpRequestType.setScheduleRequest:
+            print("set_schedule_request")
+        case OslpRequestType.setRebootRequest:
+            print("set_reboot_request")
+        case OslpRequestType.setTransitionRequest:
+            print("set_transition_request")
+        case _:
+            raise Exception("Not correct message type")
+    return msg
 
-def processMessage(device_uid,sequence_number,payload,dev):
+def checkRequest(device_uid,sequence_number,payload,dev):
     if payload.HasField("registerDeviceRequest"):
-        return handleRegisterDeviceRequest(device_uid,sequence_number,payload.registerDeviceRequest,dev)
+        return (handleRegisterDeviceRequest(device_uid,sequence_number,payload.registerDeviceRequest,dev),False)
     elif payload.HasField("confirmRegisterDeviceRequest"):
-        return handleConfirmRegisterDeviceRequest(device_uid,sequence_number,payload.confirmRegisterDeviceRequest,dev)
+        return (handleConfirmRegisterDeviceRequest(device_uid,sequence_number,payload.confirmRegisterDeviceRequest,dev),False)
     elif payload.HasField("eventNotificationRequest"):
-        return handleEventNotificationsRequest(device_uid,sequence_number,payload.eventNotificationRequest,dev)
+        # Only sequece number for EventNotificationsRequest should be incremented
+        return (handleEventNotificationsRequest(device_uid,sequence_number,payload.eventNotificationRequest,dev),True)
     else:
         raise Exception("Not correct message type")     
 

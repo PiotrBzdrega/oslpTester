@@ -1,16 +1,32 @@
 import tkinter as tk
+import queue
 
-def handle_button_press(win,func):
-    # win.destroy()
-    func()
+class gui:
+    def __init__(self,root):
+        # button = tk.Button(self.root,text="My simple app.", command=lambda: self.handle_button_press(self.root,func))
+        self.root = root
+        self.queue = queue.Queue()
+        self.root.after(100, self.process_queue)
+        # button.pack()
 
-def window(func):
+    def process_queue(self):
+        """Process all pending GUI updates in the main thread"""
+        while not self.queue.empty():
+            try:
+                task = self.queue.get_nowait()
+                task()
+            except queue.Empty:
+                pass
+        self.root.after(100, self.process_queue)
+    
+    def add_task(self, task):
+        """Add a GUI update task to the queue"""
+        self.queue.put(task)
 
-    window = tk.Tk()
-    window.geometry("400x400")
-    window.title("OSLP")
-    button = tk.Button(window,text="My simple app.", command=lambda: handle_button_press(window,func))
-    button = tk.Button(window,text="Stop", command=lambda: handle_button_press(window,func))
-    button.pack()
-    # Start the event loop.
-    window.mainloop()
+    def add_func(self,func):
+        new_button = tk.Button(self.root,text="new_button", command=func)
+        new_button.pack()
+
+    def handle_button_press(self,win,func):
+        # win.destroy()
+        func()

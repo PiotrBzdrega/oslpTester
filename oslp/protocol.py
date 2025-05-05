@@ -2,43 +2,122 @@ import threading
 import time
 import os
 import server
+import client
+import socket
 import oslp.envelope as envelope
 import oslp.message as message
 import oslp.device as device
+from oslp.types import OslpRequestType
+import gui
+from tkinter import ttk
+import tkinter as tk
+import random
 import ssl
 import crypto
 import google.protobuf
 import oslp.oslp_pb2 as oslp_pb2 #import the generated protobuf module
 from google.protobuf.json_format import MessageToJson, Parse
+from queue import Queue
 
 class protocol:
-    def __init__(self,ip: str, port: int, tls: bool):
+    def __init__(self,s_ip: str, s_port: int, c_ip: str, c_port: int, tls: bool, root):
+        self.root = root
+        self.root.geometry("400x400")
+        self.root.title("OSLP Simulator")
+        # self.gui = gui.gui(root)
+        self.queue = Queue()
+
+        self.frame = ttk.LabelFrame(self.root, text="Server")
+        self.frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+        
+        self.label = ttk.Label(self.frame, text="Counter from Thread 2: 0")
+        self.label.pack(pady=10)
+        
         self.retrieveKey()
+        self.tls = tls
         self.dev = device.device(crypto.load_key(crypto.PUBLIC_KEY, public=True))
-        self.server = server.server(ip,port,tls)
-        self.server.add_handler(handler=self.server_handler)
+
+        # Create a custom virtual event
+        # self.root.event_add("<<CheckQueue>>", '<Button-3>')
+        self.root.bind("<<CheckQueue>>", self.handle_queue)
+
+        self.server = server.server(self.server_handler,s_ip,s_port,self.tls,self.queue,self.root)
+        # self.server.add_handler(handler=self.server_handler)
+
         self.t1 = threading.Thread(target=self.server.start, name='server_handler')
 
+        self.startButton = ttk.Button(self.frame, text="Start server", command=self.start_server)
+        self.startButton.pack(pady=10)
+
+        #TODO: find a way to start and stop server
+        # self.stopButton = ttk.Button(self.frame, text="Stop server", command=self.stop_server)
+        # self.stopButton.pack(pady=10)
+
+        # self.t1.start()
+
+        self.client=client.client(self.prepareRequest,envelope.messageValidator,self.handleResponse,self.dev.setSequenceNumber,c_ip,c_port,self.tls,self.queue,self.root)
+
+    def handle_queue(self,event):
+        
+        print("handle_queue")
+        msg = self.queue.get()
+        msg()
+
+    def start_server(self):
+        print("Start server")
         self.t1.start()
+
+    def stop_server(self):
+        print("Stop server")
+        self.server.cancel()
+
+    def on_button_click(self):
+        """Button click handler (runs in main thread)"""
+        self.label.config(text=f"Counter from Thread 1: {random.randint(3, 9)}")
+        print(f"Button was clicked {random.randint(3, 9)}!")
 
         # t1.join() #TODO:needed?
 
     def retrieveKey(self):
         self.privateKey = crypto.load_key(crypto.PRIVATE_KEY, public=False)
 
-    def handleIncommingData(self,data):
+    def prepareRequest(self,type:OslpRequestType) -> envelope.envelope:
+        request_payload = message.prepareMessageType(type)
+
+        request = envelope.envelope(self.dev.getNextSequenceNumberBytes(),self.dev.getDeviceID(),request_payload,privateKey=self.privateKey)
+        return (request.encode(),self.dev.getNextSequenceNumber())
+
+    def handleRequest(self,data):
         request = envelope.envelope.decode(data)
-        if request.validate(self.dev.publicKey):
-            response_payload = message.handleMessage(request.deviceId,int.from_bytes(request.sequenceNumber, byteorder='big', signed=False),request.payload,self.dev)
+        self.validateMessage(request)
+        response_payload, increment_sequence  = message.checkRequest(request.deviceId,int.from_bytes(request.sequenceNumber, byteorder='big', signed=False),request.payload,self.dev)
+
+        # does this message require sequence increment
+        new_success_sequence = self.dev.getNextSequenceNumber() if increment_sequence else self.dev.getSequenceNumber()
+        new_success_sequence_bytes = self.dev.getNextSequenceNumberBytes() if increment_sequence else self.dev.getSequenceNumberBytes()           
+
+        print("Prepared response:")
+        print(response_payload)
+        # mirror device id
+        response = envelope.envelope(new_success_sequence_bytes,request.deviceId,response_payload,privateKey=self.privateKey)
+        return (response.encode(),new_success_sequence)
+
+    def handleResponse(self,data):
+        response = envelope.envelope.decode(data)
+        self.validateMessage(response)
+        response_payload = message.checkRequest(response.deviceId,int.from_bytes(response.sequenceNumber, byteorder='big', signed=False),response.payload,self.dev)
+
+        print("Received response:")
+        print(response_payload)
+        self.dev.setSequenceNumber()
+
+    def validateMessage(self,env:envelope.envelope) -> bool:
+        if env.validate(self.dev.publicKey):
+            return True
         else:
             raise Exception("Not valid message signature")
 
-        response = envelope.envelope(self.dev.getSequenceNumberBytes(),self.dev.deviceUid,response_payload,privateKey=self.privateKey)
-        return response.encode()
-        
-
-    def server_handler(self,client_socket=None):
-
+    def server_handler(self,client_socket:ssl.SSLSocket=None):
         buffer = bytearray(4096)  # Create preallocated to store received data
         offset = 0
         with client_socket:
@@ -47,21 +126,30 @@ class protocol:
                 while True:
                     # Receive the response from the client
                     bytes_received = client_socket.recv_into(memoryview(buffer)[offset:])
+                    print(f"bytes received {bytes_received}",) 
                     if bytes_received == 0:
                         break
                     offset += bytes_received
-                    print(bytes_received)
                     if envelope.messageValidator(buffer[:offset]):
-                        raw_response = self.handleIncommingData(buffer[:offset])
+                        raw_response, sequence_number = self.handleRequest(buffer[:offset])
                         offset = 0 
                         client_socket.sendall(raw_response)
-
-                    # 
+                        # set a new sequence number if the data has been delivered
+                        self.dev.setSequenceNumber(sequence_number)
                     # print(f"Sent: {message.strip()}"
+            except ssl.SSLError as e:
+                print(f"SSL error: {e}")
             except Exception as e:
                 print(f"Error: {e}")
             finally:
-                print("Close the connection1") 
+                print("Close the connection1")
+                if self.tls:
+                    client_socket.unwrap() # Sends TLS close_notify, converts socket to plaintext
+
+                # It disables further sends and receives on the socket, but does not close the socket yet. 
+                # This is a TCP-level shutdown, not a TLS-level one.
+                # client_socket.shutdown(socket.SHUT_RDWR)
+
                 client_socket.close()
             
 

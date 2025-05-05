@@ -66,15 +66,27 @@ class device:
         self.randomPlatform = random.randrange(0, pow(2,16) - 1) # randomPlatform has 16bit
         self.writeConfig()
 
+    # Make sure that returns format that needed, here bytes
+    def getDeviceID(self):
+        return self.deviceUid
+
     def setSequenceNumber(self,sequence_number : int):
+        print(f"New sequence number {sequence_number}")
         self.sequenceNumber = sequence_number
         self.updateSequenceNumberInConfig(sequence_number)
 
     def getSequenceNumber(self):
         return self.sequenceNumber
     
+    def getNextSequenceNumber(self) -> int:
+        next = self.sequenceNumber + 1
+        return 0 if next > MAX_SEQUENCE_NUMBER else next
+    
     def getSequenceNumberBytes(self) -> bytes:
         return self.sequenceNumber.to_bytes(length=2, byteorder='big', signed=False)
+    
+    def getNextSequenceNumberBytes(self) -> bytes:
+        return self.getNextSequenceNumber().to_bytes(length=2, byteorder='big', signed=False)    
 
     def getRandomDevice(self):
         return self.randomDevice

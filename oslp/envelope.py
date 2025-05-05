@@ -61,6 +61,7 @@ class envelope:
         # print(len(data))
         proto = oslp_pb2.Message()
         proto.ParseFromString(data)
+        # print message
         print(proto)
         return proto
 

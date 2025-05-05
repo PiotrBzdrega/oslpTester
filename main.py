@@ -1,8 +1,7 @@
 import oslp.protocol as protocol
 import gui
-import server
-from datetime import datetime
-import crypto
+import test
+import tkinter as tk
 
 if __name__ == "__main__":
     # gui.window(p)
@@ -19,5 +18,14 @@ if __name__ == "__main__":
     # protocol.message2()
     # protocol.createConfiguration()
 
-    isTLS = True
-    oslpInstance = protocol.protocol("0.0.0.0",12123,isTLS)
+    testing = False
+    
+    if testing:
+        test.testCheckwindow()
+    else:
+        root = tk.Tk()
+        isTLS = True
+        oslpInstance = protocol.protocol("0.0.0.0",12123,"172.20.73.33",12125,isTLS,root)
+        root.mainloop()
+        # tk._test()
+
