@@ -8,7 +8,7 @@ CFG_FILE = 'cache.json'
 
 class device:
     def __init__(self,publicKey):
-        self.deviceUid = None
+        self.deviceUid:bytes = None
         self.deviceIdentification = None
         self.deviceType = None
         self.sequenceNumber = None
@@ -24,6 +24,7 @@ class device:
                 with open(CFG_FILE, 'r') as file:
                     cfg = json.load(file)
                 print(cfg)
+                self.deviceUid = bytearray.fromhex(cfg['deviceUid'])
                 self.randomDevice   = cfg['randomDevice']
                 self.randomPlatform = cfg['randomPlatform']
                 self.sequenceNumber = cfg['sequenceNumber']
@@ -34,7 +35,7 @@ class device:
 
     def writeConfig(self):
         data = {
-            "deviceUid"             : int.from_bytes(self.deviceUid, byteorder='big', signed=False),
+            "deviceUid"             : self.deviceUid.hex(),
             # "deviceIdentification"  : int.from_bytes(self.deviceIdentification, byteorder='big', signed=False),
             "randomDevice"          : self.randomDevice,
             "randomPlatform"        : self.randomPlatform,
@@ -58,7 +59,12 @@ class device:
             except FileNotFoundError:
                 print("❌ File not found.")
     
-    def updateRegisterData(self,device_uid, device_type, random_device):
+    def updateRegisterData(self,device_uid:bytes, device_type, random_device):
+        # print(f"{self.updateRegisterData.__name__}() deviceUID:{device_uid}")
+        # ascii_string = device_uid.hex()
+        # print(ascii_string)  # Output: '\x00\x0466r\x98Vb\n&\xeb!'
+        # byte_data = bytearray.fromhex(ascii_string)
+        # print(f"{self.updateRegisterData.__name__}() deviceUID:{byte_data}")
         self.deviceUid = device_uid
         self.deviceType = device_type
         self.sequenceNumber = None

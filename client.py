@@ -3,14 +3,15 @@ import socket
 import tkinter as tk
 from queue import Queue
 from oslp.types import OslpRequestType
+from datetime import datetime,timezone
 
 ca_root_cert  = "/certs/ca.crt"         # for client validation
 platform_cert = "/certs/platform.crt"   # client/server certificate
 platform_key  = "/certs/platform.key"   # client/server certificate private key
 
 class client:
-    def __init__(self, prepare_request_handler:function, msg_validator:function, response_handler:function, set_sequence_number:function, server="0.0.0.0", port=12125, tls=True, queue: Queue =None,root:tk.Tk=None):
-        self.server = server
+    def __init__(self, prepare_request_handler, msg_validator, response_handler, set_sequence_number, server_ip="0.0.0.0", port=12125, tls=True, queue: Queue =None,root:tk.Tk=None):
+        self.server_ip = server_ip
         self.port = port
         self.tls = tls
         self.queue = queue
@@ -46,8 +47,19 @@ class client:
         # self.droplist.config(indicatoron=False,background="orange")  # Hide the indicator
         self.droplist.pack(pady=20)
 
-        self.send_request_button = tk.Button(self.c_frame, text="Send request", command=lambda:self.request_type(self.oslp_type.get()))
+        self.send_request_button = tk.Button(self.c_frame, text="Send request", command=self.start)
         self.send_request_button.pack(pady=10)
+
+        """ SET TRANSITION """
+        self.time_label = tk.Label(self.c_frame, text="transitionTime")
+        self.time_label.pack(pady=10)
+        self.time = tk.Entry(self.c_frame, width=15)
+        utc_now = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+        self.time.insert(-1,utc_now)
+        self.time.pack(pady=10)
+
+        """ SET TRANSITION """
+        
 
     def update_label(self,selection):
         # self.selected_label.config(text=f'You chose: {selection}')
@@ -66,6 +78,9 @@ class client:
             # Load client certificate and private key
             context.load_cert_chain(certfile=platform_cert, keyfile=platform_key)
 
+            # Disable hostname verification
+            context.check_hostname = False  
+
             # Require server certificate for mutual TLS #TODO: not needed already set in PROTOCOL_TLS_CLIENT
             context.verify_mode = ssl.CERT_REQUIRED
 
@@ -81,17 +96,18 @@ class client:
             client_socket.settimeout(15)
 
             # wrap an existing socket with SSLContext
-            client_socket = context.wrap_socket(client_socket)
+            client_socket = context.wrap_socket(client_socket, server_side=False, server_hostname=self.server_ip)
+            # client_socket = context.wrap_socket(client_socket, server_side=False)
 
         try:
-            client_socket.connect(self.server,self.port)
-            print(f"Successfully connected to {self.server} with TLS 1.3")
+            client_socket.connect((self.server_ip,self.port))
+            print(f"Successfully connected to {self.server_ip} with TLS 1.3")
             print(f"Negotiated cipher: {client_socket.cipher()}")
             print(f"Using protocol: {client_socket.version()}")
             return self.exchange(client_socket)
         except socket.timeout:
             client_socket.close()
-            raise Exception(f"Connection to {self.server} timed out ")
+            raise Exception(f"Connection to {self.server_ip} timed out ")
         except Exception as e:
             client_socket.close()
             raise Exception(f"Failed to establish secure connection: {str(e)}")      
@@ -127,8 +143,13 @@ class client:
         except Exception as e:
             print(f"Error: {e}")
         finally:
-            print("Close the connection1")            
-
+            print("Close the connection")            
+            if self.tls:
+                socket.unwrap() # Sends TLS close_notify, converts socket to plaintext
+            # It disables further sends and receives on the socket, but does not close the socket yet. 
+            # This is a TCP-level shutdown, not a TLS-level one.
+            # client_socket.shutdown(socket.SHUT_RDWR)
+            socket.close()
 
 
 

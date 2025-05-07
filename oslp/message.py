@@ -1,6 +1,6 @@
 import oslp.oslp_pb2 as oslp_pb2 #import the generated protobuf module
 import oslp.device as device
-from datetime import datetime
+from datetime import datetime,timezone
 from oslp.types import OslpRequestType
 
 # OslpChannelHandlerServer.java channelRead0
@@ -9,29 +9,64 @@ from oslp.types import OslpRequestType
 
 def prepareMessageType(type:OslpRequestType):
     print(f"function: {prepareMessageType.__name__}({type})")
-    msg = oslp_pb2.Message()
+    msg = oslp_pb2.Message()    
     match type:
         case OslpRequestType.startSelfTestRequest:
-            print("start_selftest_request")
+            msg.startSelfTestRequest.CopyFrom(oslp_pb2.StartSelfTestRequest())
         case OslpRequestType.stopSelfTestRequest:
-            print("stop_selftest_request")
+            msg.stopSelfTestRequest.CopyFrom(oslp_pb2.StopSelfTestRequest())
         case OslpRequestType.setLightRequest:
-            print("set_light_request")
+            msg.setLightRequest.CopyFrom(oslp_pb2.SetLightRequest())
+            value1 = oslp_pb2.LightValue()
+            value1.on = True
+            # value1.index = b'\x01'
+
+            # value2 = oslp_pb2.LightValue()
+            # value2.on = False
+            # value2.index = b'\x02'
+            msg.setLightRequest.values.append(value1)
         case OslpRequestType.getStatusRequest:
-            msg.getStatusRequest
+            msg.getStatusRequest.CopyFrom(oslp_pb2.GetStatusRequest())
         case OslpRequestType.resumeScheduleRequest:
-            print("resume_schedule_request")
+            msg.resumeScheduleRequest.CopyFrom(oslp_pb2.ResumeScheduleRequest())
+            msg.resumeScheduleRequest.immediate = True
+            # msg.resumeScheduleRequest.index = 1/2/3/4
         case OslpRequestType.setEventNotificationsRequest:
-            print("set_event_notifications_request")
+            msg.setEventNotificationsRequest.CopyFrom(oslp_pb2.SetEventNotificationsRequest())
+            msg.setEventNotificationsRequest.NotificationMask = 255
         case OslpRequestType.setScheduleRequest:
-            print("set_schedule_request")
+            raise NotImplementedError("doit")
         case OslpRequestType.setRebootRequest:
-            print("set_reboot_request")
+            msg.setRebootRequest.CopyFrom(oslp_pb2.SetRebootRequest())
         case OslpRequestType.setTransitionRequest:
-            print("set_transition_request")
+            msg.setTransitionRequest.CopyFrom(oslp_pb2.SetTransitionRequest())
+            msg.setTransitionRequest.transitionType = oslp_pb2.TransitionType.NIGHT_DAY # oslp_pb2.TransitionType.DAY_NIGHT
+            msg.setTransitionRequest.time = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
         case _:
             raise Exception("Not correct message type")
+    print("Prepared message type")
+    print(msg)
     return msg
+
+def checkResponse(device_uid,sequence_number,payload,dev):
+    if ( 
+        payload.HasField("startSelfTestResponse") or
+        payload.HasField("stopSelfTestResponse") or
+        payload.HasField("stopSelfTestResponse") or
+        payload.HasField("setLightResponse") or
+        payload.HasField("getStatusResponse") or
+        payload.HasField("resumeScheduleResponse") or
+        payload.HasField("setEventNotificationsResponse") or
+        payload.HasField("setScheduleResponse") or
+        payload.HasField("setRebootResponse") or
+        payload.HasField("setTransitionResponse")
+    ):
+        if dev.checkSequenceNumber(sequence_number):
+            dev.setSequenceNumber(sequence_number)
+            print("Received message")
+            print(payload)
+    else:
+        raise Exception("Not correct message type")     
 
 def checkRequest(device_uid,sequence_number,payload,dev):
     if payload.HasField("registerDeviceRequest"):
@@ -42,7 +77,7 @@ def checkRequest(device_uid,sequence_number,payload,dev):
         # Only sequece number for EventNotificationsRequest should be incremented
         return (handleEventNotificationsRequest(device_uid,sequence_number,payload.eventNotificationRequest,dev),True)
     else:
-        raise Exception("Not correct message type")     
+        raise Exception("Not correct message type") 
 
 def handleRegisterDeviceRequest(device_uid,sequence_number,registerDeviceRequest,dev):
 

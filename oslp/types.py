@@ -1,19 +1,15 @@
 from enum import StrEnum, auto
 
-class custom_auto:
-    def __get__(self, obj, objtype=None):
-        return obj._name_
-
 class OslpRequestType(StrEnum):
-    startSelfTestRequest = custom_auto()
-    stopSelfTestRequest = custom_auto()
-    setLightRequest = custom_auto()
-    getStatusRequest = custom_auto()
-    resumeScheduleRequest = custom_auto()
-    setEventNotificationsRequest = auto()
-    setScheduleRequest = custom_auto()
-    setRebootRequest = custom_auto()
-    setTransitionRequest = custom_auto()
+    startSelfTestRequest = "startSelfTestRequest"
+    stopSelfTestRequest = "stopSelfTestRequest"
+    setLightRequest = "setLightRequest"
+    getStatusRequest = "getStatusRequest"
+    resumeScheduleRequest = "resumeScheduleRequest"
+    setEventNotificationsRequest = "setEventNotificationsRequest"
+    setScheduleRequest = "setScheduleRequest"
+    setRebootRequest = "setRebootRequest"
+    setTransitionRequest = "setTransitionRequest"
 
 # class OslpResponseType(StrEnum):
 #     start_selftest_request = auto()

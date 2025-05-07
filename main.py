@@ -5,7 +5,6 @@ import tkinter as tk
 
 if __name__ == "__main__":
     # gui.window(p)
-
     # integer_value = int.from_bytes(data, byteorder='big', signed=False)
     # print(integer_value)
     # x = int(datetime.now().astimezone().utcoffset().total_seconds() / 60)

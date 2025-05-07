@@ -83,7 +83,6 @@ class protocol:
 
     def prepareRequest(self,type:OslpRequestType) -> envelope.envelope:
         request_payload = message.prepareMessageType(type)
-
         request = envelope.envelope(self.dev.getNextSequenceNumberBytes(),self.dev.getDeviceID(),request_payload,privateKey=self.privateKey)
         return (request.encode(),self.dev.getNextSequenceNumber())
 
@@ -105,11 +104,7 @@ class protocol:
     def handleResponse(self,data):
         response = envelope.envelope.decode(data)
         self.validateMessage(response)
-        response_payload = message.checkRequest(response.deviceId,int.from_bytes(response.sequenceNumber, byteorder='big', signed=False),response.payload,self.dev)
-
-        print("Received response:")
-        print(response_payload)
-        self.dev.setSequenceNumber()
+        message.checkRequest(response.deviceId,int.from_bytes(response.sequenceNumber, byteorder='big', signed=False),response.payload,self.dev)
 
     def validateMessage(self,env:envelope.envelope) -> bool:
         if env.validate(self.dev.publicKey):
