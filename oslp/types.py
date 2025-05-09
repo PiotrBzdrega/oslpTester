@@ -10,6 +10,8 @@ class OslpRequestType(StrEnum):
     setScheduleRequest = "setScheduleRequest"
     setRebootRequest = "setRebootRequest"
     setTransitionRequest = "setTransitionRequest"
+    getConfigurationRequest = "getConfigurationRequest"
+    setConfigurationRequest = "setConfigurationRequest"
 
 # class OslpResponseType(StrEnum):
 #     start_selftest_request = auto()

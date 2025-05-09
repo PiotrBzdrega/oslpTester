@@ -4,8 +4,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 
-PRIVATE_KEY = "/keys/platform_ecdsa_private.der" #"/mnt/nvm/OSLitaP/keys/private_sim_key.der"
-PUBLIC_KEY = "/keys/device_ecdsa_public.der"#"/mnt/nvm/OSLitaP/keys/public_sim_key.der" 
+PRIVATE_KEY = "/keys/platform_ecdsa_private.pem" #"/mnt/nvm/OSLitaP/keys/private_sim_key.der"
+PUBLIC_KEY = "/keys/device_ecdsa_public.pem"#"/mnt/nvm/OSLitaP/keys/public_sim_key.der" 
 
 def create_hash(data):
     # Create a SHA-256 hash object
@@ -22,9 +22,9 @@ def create_hash(data):
 def load_key(path,public: bool):
     with open(path,"rb") as key_file:
         if public:
-            key =  serialization.load_der_public_key(key_file.read())
+            key =  serialization.load_pem_public_key(key_file.read())
         else:
-            key =  serialization.load_der_private_key(key_file.read(),password=None)
+            key =  serialization.load_pem_private_key(key_file.read(),password=None)
     return key
 
 

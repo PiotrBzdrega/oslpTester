@@ -2,6 +2,7 @@ import oslp.protocol as protocol
 import gui
 import test
 import tkinter as tk
+from signal import signal, SIGPIPE, SIG_IGN
 
 if __name__ == "__main__":
     # gui.window(p)
@@ -16,6 +17,9 @@ if __name__ == "__main__":
     # protocol.serializeNotification()
     # protocol.message2()
     # protocol.createConfiguration()
+
+
+    signal(SIGPIPE,SIG_IGN)
 
     testing = False
     

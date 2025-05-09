@@ -18,44 +18,31 @@ import google.protobuf
 import oslp.oslp_pb2 as oslp_pb2 #import the generated protobuf module
 from google.protobuf.json_format import MessageToJson, Parse
 from queue import Queue
+import client_gui
 
 class protocol:
     def __init__(self,s_ip: str, s_port: int, c_ip: str, c_port: int, tls: bool, root):
         self.root = root
-        self.root.geometry("400x400")
+        self.root.geometry("600x600")
         self.root.title("OSLP Simulator")
-        # self.gui = gui.gui(root)
         self.queue = Queue()
 
-        self.frame = ttk.LabelFrame(self.root, text="Server")
-        self.frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        
-        self.label = ttk.Label(self.frame, text="Counter from Thread 2: 0")
-        self.label.pack(pady=10)
-        
+        # Create a custom virtual event
+        self.root.bind("<<CheckQueue>>", self.handle_queue)
+
         self.retrieveKey()
         self.tls = tls
         self.dev = device.device(crypto.load_key(crypto.PUBLIC_KEY, public=True))
 
-        # Create a custom virtual event
-        # self.root.event_add("<<CheckQueue>>", '<Button-3>')
-        self.root.bind("<<CheckQueue>>", self.handle_queue)
-
         self.server = server.server(self.server_handler,s_ip,s_port,self.tls,self.queue,self.root)
-        # self.server.add_handler(handler=self.server_handler)
 
         self.t1 = threading.Thread(target=self.server.start, name='server_handler')
 
-        self.startButton = ttk.Button(self.frame, text="Start server", command=self.start_server)
-        self.startButton.pack(pady=10)
-
-        #TODO: find a way to start and stop server
-        # self.stopButton = ttk.Button(self.frame, text="Stop server", command=self.stop_server)
-        # self.stopButton.pack(pady=10)
-
-        # self.t1.start()
-
         self.client=client.client(self.prepareRequest,envelope.messageValidator,self.handleResponse,self.dev.setSequenceNumber,c_ip,c_port,self.tls,self.queue,self.root)
+
+        self.server_gui()
+        self.client_states=client_gui.client_gui(self.root,self.client.start)
+
 
     def handle_queue(self,event):
         
@@ -81,13 +68,16 @@ class protocol:
     def retrieveKey(self):
         self.privateKey = crypto.load_key(crypto.PRIVATE_KEY, public=False)
 
-    def prepareRequest(self,type:OslpRequestType) -> envelope.envelope:
-        request_payload = message.prepareMessageType(type)
+    def prepareRequest(self) -> envelope.envelope:
+        request_payload = message.prepareMessageType(self.client_states)
         request = envelope.envelope(self.dev.getNextSequenceNumberBytes(),self.dev.getDeviceID(),request_payload,privateKey=self.privateKey)
         return (request.encode(),self.dev.getNextSequenceNumber())
 
     def handleRequest(self,data):
         request = envelope.envelope.decode(data)
+        print("Received request:")
+        print(request.payload)
+
         self.validateMessage(request)
         response_payload, increment_sequence  = message.checkRequest(request.deviceId,int.from_bytes(request.sequenceNumber, byteorder='big', signed=False),request.payload,self.dev)
 
@@ -104,7 +94,7 @@ class protocol:
     def handleResponse(self,data):
         response = envelope.envelope.decode(data)
         self.validateMessage(response)
-        message.checkRequest(response.deviceId,int.from_bytes(response.sequenceNumber, byteorder='big', signed=False),response.payload,self.dev)
+        message.checkResponse(response.deviceId,int.from_bytes(response.sequenceNumber, byteorder='big', signed=False),response.payload,self.dev)
 
     def validateMessage(self,env:envelope.envelope) -> bool:
         if env.validate(self.dev.publicKey):
@@ -152,7 +142,24 @@ class protocol:
         for n in [0,1,2,3]:
             print(n)
             time.sleep(1)
-     
+
+    def server_gui(self):
+        self.s_frame = ttk.LabelFrame(self.root, text="Server")
+        self.s_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+        
+        self.label = ttk.Label(self.s_frame, text="Counter from Thread 2: 0")
+        self.label.pack(pady=10)
+        
+        self.startButton = ttk.Button(self.s_frame, text="Start server", command=self.start_server)
+        self.startButton.pack(pady=10)
+
+        #TODO: find a way to start and stop server
+        # self.stopButton = ttk.Button(self.frame, text="Stop server", command=self.stop_server)
+        # self.stopButton.pack(pady=10)
+
+
+        
+
 
 
 def protobuf_ver():

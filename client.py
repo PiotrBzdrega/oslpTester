@@ -3,7 +3,6 @@ import socket
 import tkinter as tk
 from queue import Queue
 from oslp.types import OslpRequestType
-from datetime import datetime,timezone
 
 ca_root_cert  = "/certs/ca.crt"         # for client validation
 platform_cert = "/certs/platform.crt"   # client/server certificate
@@ -21,44 +20,44 @@ class client:
         self.msg_validator = msg_validator
         self.response_handler = response_handler
         self.set_sequence_number = set_sequence_number
-        self.gui_update(self.gui_init)
+    #     self.gui_update(self.gui_init)
 
-    def gui_update(self,func):
-        self.queue.put(func)
-        # self.root.event_generate("<<CheckQueue>>",data="adam")
-        self.root.event_generate("<<CheckQueue>>")
+    # def gui_update(self,func):
+    #     self.queue.put(func)
+    #     # self.root.event_generate("<<CheckQueue>>",data="adam")
+    #     self.root.event_generate("<<CheckQueue>>")
 
-    def gui_init(self):
+    # def gui_init(self):
 
-        self.c_frame = tk.LabelFrame(self.root, text="Client")
-        self.c_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+    #     self.c_frame = tk.LabelFrame(self.root, text="Client")
+    #     self.c_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         
-        # self.c_label = tk.Label(self.c_frame, text="Counter from Thread 1: 0")
-        # self.c_label.pack(pady=10)
+    #     # self.c_label = tk.Label(self.c_frame, text="Counter from Thread 1: 0")
+    #     # self.c_label.pack(pady=10)
         
-        self.selected_label1 = tk.Label(self.c_frame, text="adam")
-        self.selected_label1.pack(pady=10)
+    #     self.selected_label1 = tk.Label(self.c_frame, text="adam")
+    #     self.selected_label1.pack(pady=10)
 
-        self.oslp_type = tk.StringVar(self.c_frame)
-        self.oslp_type.set(OslpRequestType.getStatusRequest)
+    #     self.oslp_type = tk.StringVar(self.c_frame)
+    #     self.oslp_type.set(OslpRequestType.getStatusRequest)
 
-        # self.droplist = tk.OptionMenu(self.c_frame,self.oslp_type, *OSLP_type, command=self.update_label)
-        self.droplist = tk.OptionMenu(self.c_frame,self.oslp_type, *OslpRequestType)
-        # self.droplist.config(indicatoron=False,background="orange")  # Hide the indicator
-        self.droplist.pack(pady=20)
+    #     # self.droplist = tk.OptionMenu(self.c_frame,self.oslp_type, *OSLP_type, command=self.update_label)
+    #     self.droplist = tk.OptionMenu(self.c_frame,self.oslp_type, *OslpRequestType)
+    #     # self.droplist.config(indicatoron=False,background="orange")  # Hide the indicator
+    #     self.droplist.pack(pady=20)
 
-        self.send_request_button = tk.Button(self.c_frame, text="Send request", command=self.start)
-        self.send_request_button.pack(pady=10)
+    #     self.send_request_button = tk.Button(self.c_frame, text="Send request", command=self.start)
+    #     self.send_request_button.pack(pady=10)
 
-        """ SET TRANSITION """
-        self.time_label = tk.Label(self.c_frame, text="transitionTime")
-        self.time_label.pack(pady=10)
-        self.time = tk.Entry(self.c_frame, width=15)
-        utc_now = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-        self.time.insert(-1,utc_now)
-        self.time.pack(pady=10)
+    #     """ SET TRANSITION """
+    #     self.time_label = tk.Label(self.c_frame, text="transitionTime")
+    #     self.time_label.pack(pady=10)
+    #     self.time = tk.Entry(self.c_frame, width=15)
+    #     utc_now = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    #     self.time.insert(-1,utc_now)
+    #     self.time.pack(pady=10)
 
-        """ SET TRANSITION """
+    #     """ SET TRANSITION """
         
 
     def update_label(self,selection):
@@ -122,7 +121,7 @@ class client:
     def exchange(self,socket:ssl.SSLSocket):
         buffer = bytearray(4096)  # Create preallocated to store received data
         offset = 0
-        raw_request, sequence_number = self.prepare_request_handler(self.oslp_type.get())
+        raw_request, sequence_number = self.prepare_request_handler()
         try:
             socket.sendall(raw_request)
             # set a new sequence number if the data has been delivered
@@ -130,12 +129,13 @@ class client:
             while True:
                 # Receive the response from the server
                 bytes_received = socket.recv_into(memoryview(buffer)[offset:])
-                print(f"{bytes_received} bytes received from Server") 
+                # print(f"{bytes_received} bytes received from Server") 
                 if bytes_received == 0:
                     break
                 offset += bytes_received
                 if self.msg_validator(buffer[:offset]):
                     self.response_handler(buffer[:offset])
+                    break
 
 
         except ssl.SSLError as e:
