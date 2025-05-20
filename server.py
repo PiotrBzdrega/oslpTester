@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from queue import Queue
 import cancellation
+import select
 
 ca_root_cert  = "/certs/ca.crt"         # for client validation
 platform_cert = "/certs/platform.crt"   # client/server certificate
@@ -18,11 +19,17 @@ class server:
         self.queue = queue
         self.root = root
         self.handler = handler
-        self.client_socket = 0
+        # Create wakeup socket pair
+        self.wakeup_r = -1
+        self.wakeup_w = -1
+        # self.client_socket = -1
         # self.gui_update(self.gui_init)
 
     def cancel(self):
+        print("try cancel server")
         self.ct.cancel()
+        """Trigger the select() to wake up"""
+        self.wakeup_w.send(b'\x00')  # Send a dummy byte
 
     def gui_update(self,func):
         self.queue.put(func)
@@ -44,6 +51,8 @@ class server:
 
     def start(self):
 
+        self.ct.reset()
+        self.wakeup_r, self.wakeup_w = socket.socketpair()
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
 
             # print("OpenSSL version:", ssl.OPENSSL_VERSION)
@@ -84,8 +93,14 @@ class server:
                 server_socket = context.wrap_socket(server_socket, server_side=True)
 
             while not self.ct.is_canceled():
-                client_socket, client_address = server_socket.accept()
-                print(f"Connection from {client_address}")
-                self.handler(client_socket)
-                print("Server waits for the next request")
-            print("Server stopped")
+                # self.client_socket = -1
+                print("Server waits for the next request on select")
+                readable, _, _ = select.select([server_socket, self.wakeup_r], [], [])
+                for sock in readable:
+                    if sock is server_socket:
+                        client_socket, client_address = server_socket.accept()
+                        print(f"Connection from {client_address}")
+                        self.handler(client_socket)
+            print("Server thread is stopping")
+            self.wakeup_w.close()
+            self.wakeup_r.close()

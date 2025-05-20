@@ -26,6 +26,9 @@ class protocol:
         self.root.geometry("600x600")
         self.root.title("OSLP Simulator")
         self.queue = Queue()
+        self.s_ip=s_ip
+        self.s_port=s_port
+
 
         # Create a custom virtual event
         self.root.bind("<<CheckQueue>>", self.handle_queue)
@@ -34,9 +37,11 @@ class protocol:
         self.tls = tls
         self.dev = device.device(crypto.load_key(crypto.PUBLIC_KEY, public=True))
 
-        self.server = server.server(self.server_handler,s_ip,s_port,self.tls,self.queue,self.root)
+        self.server = server.server(self.server_handler,self.s_ip,self.s_port,self.tls,self.queue,self.root)
+        # self.server = None
 
-        self.t1 = threading.Thread(target=self.server.start, name='server_handler')
+        # self.server_thread = threading.Thread(target=self.server.start, name='server_handler')
+        self.server_thread : threading.Thread = None
 
         self.client=client.client(self.prepareRequest,envelope.messageValidator,self.handleResponse,self.dev.setSequenceNumber,c_ip,c_port,self.tls,self.queue,self.root)
 
@@ -51,12 +56,26 @@ class protocol:
         msg()
 
     def start_server(self):
-        print("Start server")
-        self.t1.start()
+
+        if self.server_thread is None or not self.server_thread.is_alive():
+            # self.server = server.server(self.server_handler,self.s_ip,self.s_port,self.tls,self.queue,self.root)
+            self.server_thread = threading.Thread(target=self.server.start, name='server_handler')    
+            self.server_thread.start()
+            print("Server started")
+        else:
+            print("Server is already running, cannot start another instance")
 
     def stop_server(self):
-        print("Stop server")
-        self.server.cancel()
+        
+        if self.server_thread is not None:
+            if self.server_thread.is_alive():
+                # send cancelation token
+                self.server.cancel()
+            self.server_thread.join()
+            self.server_thread = None
+            print("Server has been stopped")
+        else:
+            print("Server is not running, no need to stop")
 
     def on_button_click(self):
         """Button click handler (runs in main thread)"""
@@ -147,15 +166,24 @@ class protocol:
         self.s_frame = ttk.LabelFrame(self.root, text="Server")
         self.s_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         
-        self.label = ttk.Label(self.s_frame, text="Counter from Thread 2: 0")
-        self.label.pack(pady=10)
+        # def validate_ip(new_text):
+        #    return (new_text.isdigit() and len(new_text) <= 14) or new_text==""
+
+        # # Register the validation function
+        # validate_server_ip = self.root.register(validate_ip)
+
+        # self.server_ip = tk.Entry(self.c_frame,validate="key", validatecommand=(validate_server_ip, '%P'), width=16)
+
+        # self.label = ttk.Label(self.s_frame, text="Counter from Thread 2: 0")
+        # self.label.pack(pady=10)
         
         self.startButton = ttk.Button(self.s_frame, text="Start server", command=self.start_server)
-        self.startButton.pack(pady=10)
+        # self.startButton.pack(pady=10)
+        self.startButton.grid(column=0,row=0,columnspan=3)
 
         #TODO: find a way to start and stop server
-        # self.stopButton = ttk.Button(self.frame, text="Stop server", command=self.stop_server)
-        # self.stopButton.pack(pady=10)
+        self.stopButton = ttk.Button(self.s_frame, text="Stop server", command=self.stop_server)
+        self.stopButton.grid(column=0,row=1,columnspan=2)
 
 
         

@@ -13,6 +13,10 @@ class OslpRequestType(StrEnum):
     getConfigurationRequest = "getConfigurationRequest"
     setConfigurationRequest = "setConfigurationRequest"
 
+class OslpTransitionType(StrEnum):
+    night_day = "night_day"
+    day_night = "day_night"
+
 # class OslpResponseType(StrEnum):
 #     start_selftest_request = auto()
 #     stop_selftest_request = auto()

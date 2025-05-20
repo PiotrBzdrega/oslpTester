@@ -1,8 +1,9 @@
 import oslp.oslp_pb2 as oslp_pb2 #import the generated protobuf module
 import oslp.device as device
 from datetime import datetime,timezone
-from oslp.types import OslpRequestType
+from oslp.types import *
 import client_gui
+from google.protobuf.json_format import Parse
 
 # OslpChannelHandlerServer.java channelRead0
 
@@ -17,40 +18,69 @@ def prepareMessageType(client_states:client_gui.client_gui):
         case OslpRequestType.stopSelfTestRequest:
             msg.stopSelfTestRequest.CopyFrom(oslp_pb2.StopSelfTestRequest())
         case OslpRequestType.setLightRequest:
-            msg.setLightRequest.CopyFrom(oslp_pb2.SetLightRequest())
-            value1 = oslp_pb2.LightValue()
-            value1.on = True
+            set_light_proto = oslp_pb2.SetLightRequest()
+
+            with open(client_states.setlight_dir.get(), "r") as f:
+                json_set_light = f.read()
+                # Parse JSON into the Protobuf message
+                Parse(json_set_light, set_light_proto)
+                msg.setLightRequest.CopyFrom(set_light_proto)
+
+            # value1 = oslp_pb2.LightValue()
+            # value1.on = True
             # value1.index = b'\x01'
 
             # value2 = oslp_pb2.LightValue()
             # value2.on = False
             # value2.index = b'\x02'
-            msg.setLightRequest.values.append(value1)
+            # msg.setLightRequest.values.append(value1)
         case OslpRequestType.getStatusRequest:
             msg.getStatusRequest.CopyFrom(oslp_pb2.GetStatusRequest())
         case OslpRequestType.resumeScheduleRequest:
             msg.resumeScheduleRequest.CopyFrom(oslp_pb2.ResumeScheduleRequest())
-            msg.resumeScheduleRequest.immediate = True
-            # msg.resumeScheduleRequest.index = 1/2/3/4
+            msg.resumeScheduleRequest.immediate = client_states.immediate_var.get()
+
+            if client_states.resume_idx.get() != "":
+                index:int = int(client_states.resume_idx.get())
+                index_bytes = index.to_bytes(length=1, byteorder='big', signed=False)
+                print(index_bytes)
+                msg.resumeScheduleRequest.index = index_bytes
+
         case OslpRequestType.setEventNotificationsRequest:
             msg.setEventNotificationsRequest.CopyFrom(oslp_pb2.SetEventNotificationsRequest())
             msg.setEventNotificationsRequest.NotificationMask = 255
         case OslpRequestType.setScheduleRequest:
-            raise NotImplementedError("doit")
+            schedule = oslp_pb2.SetScheduleRequest()
+            dir=client_states.schedule_dir.get()
+            partial_schedule = client_states.list_dir_files("SetSchedule",dir)
+
+            with open(partial_schedule[0], "r") as f:
+                json_text = f.read()
+                # Parse JSON into the Protobuf message
+                Parse(json_text, schedule)
+                msg.setScheduleRequest.CopyFrom(schedule)
+
+            # raise NotImplementedError("doit")
         case OslpRequestType.getConfigurationRequest:
             msg.getConfigurationRequest.CopyFrom(oslp_pb2.GetConfigurationRequest())
         case OslpRequestType.setConfigurationRequest:
-            raise NotImplementedError("doit")        
+            raise NotImplementedError("doit")
         case OslpRequestType.setRebootRequest:
             msg.setRebootRequest.CopyFrom(oslp_pb2.SetRebootRequest())
         case OslpRequestType.setTransitionRequest:
             msg.setTransitionRequest.CopyFrom(oslp_pb2.SetTransitionRequest())
-            msg.setTransitionRequest.transitionType = oslp_pb2.TransitionType.NIGHT_DAY # oslp_pb2.TransitionType.DAY_NIGHT
-            # msg.setTransitionRequest.time = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 
-            # Check if not empty
+            if client_states.trans_radvar.get() == OslpTransitionType.night_day:
+                msg.setTransitionRequest.transitionType = oslp_pb2.TransitionType.NIGHT_DAY
+            else:
+                msg.setTransitionRequest.transitionType = oslp_pb2.TransitionType.DAY_NIGHT
+
+            # Specify time if field not empty
             if client_states.time.get():
                 msg.setTransitionRequest.time = client_states.time.get()
+            # .. otherwise send without time -> device will take now
+            # msg.setTransitionRequest.time = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+
         case _:
             raise Exception(f"Not correct message type {prepareMessageType.__name__}")
     print("Prepared message type")

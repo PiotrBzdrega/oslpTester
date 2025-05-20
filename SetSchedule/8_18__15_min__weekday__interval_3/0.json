@@ -1,0 +1,269 @@
+{
+    "schedules": [
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "080000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "081500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "090000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "091500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "100000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "101500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "110000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "111500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "120000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "121500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "130000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "131500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "140000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "141500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "150000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "151500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "160000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "161500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "160000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "161500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "170000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "171500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "180000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "WEEKDAY",
+            "actionTime": "ABSOLUTETIME",
+            "time": "181500",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        }
+    ],
+    "scheduleType": "LIGHT"
+}

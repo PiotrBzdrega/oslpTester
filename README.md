@@ -22,8 +22,21 @@ source .venv/bin/activate
 pip3 install protobuf==5.29.3
 pip3 install cryptography
 ```
+### vscode
+```text
+To run from vscode, make sure that virtual environment is used as interpreter:
+CTRL+SHIFT+P 
+Python:Select Interpreter
+```
+
 
 ### connect to server
 ```shell
 nc -v localhost 12123
+```
+
+
+### deactivate virtual environment
+```shell
+deactivate
 ```

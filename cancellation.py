@@ -5,3 +5,5 @@ class CancellationToken:
             return self._is_canceled
     def cancel(self):
         self._is_canceled = True
+    def reset(self):
+        self._is_canceled = False

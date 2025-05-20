@@ -16,8 +16,7 @@ if __name__ == "__main__":
 
     # protocol.serializeNotification()
     # protocol.message2()
-    # protocol.createConfiguration()
-
+    # protocol.createConfiguration() 
 
     signal(SIGPIPE,SIG_IGN)
 
@@ -29,6 +28,14 @@ if __name__ == "__main__":
         root = tk.Tk()
         isTLS = True
         oslpInstance = protocol.protocol("0.0.0.0",12123,"172.20.73.33",12125,isTLS,root)
+
+        
+        def on_window_close():
+            oslpInstance.stop_server()  # First action
+            root.destroy()              # Second action
+
+        root.protocol("WM_DELETE_WINDOW",on_window_close)
+
         root.mainloop()
         # tk._test()
 
