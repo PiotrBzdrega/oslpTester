@@ -19,8 +19,11 @@ sudo apt install python3-tk
 sudo apt install python3.12-venv
 python3 -m venv .venv
 source .venv/bin/activate
-pip3 install protobuf==5.29.3
+pip3 install protobuf==6.31.1
 pip3 install cryptography
+# generate protobuf contract
+protoc --python_out=. oslp.proto
+
 ```
 ### vscode
 ```text
