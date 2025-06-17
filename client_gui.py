@@ -19,11 +19,15 @@ class client_gui:
         return onlydir
     
     @staticmethod
-    def list_dir_files(parent_dir:str,schedule_dir):
+    def list_dir_json_files(parent_dir:str,schedule_dir):
         current_path = os.getcwd()
         schedules_path = os.path.join(current_path,parent_dir,schedule_dir)
         # print(schedules_path)
-        onlyfile = [os.path.join(schedules_path, dir) for dir in os.listdir(schedules_path) if os.path.isfile(os.path.join(schedules_path, dir))]
+        onlyfile = [
+            os.path.join(schedules_path, filename) 
+            for filename in os.listdir(schedules_path) 
+            if os.path.isfile(os.path.join(schedules_path, filename) ) and os.path.splitext(os.path.join(schedules_path, filename))[1].lower() == ".json" # second element holds the file extension
+            ]
         # print(onlyfile)
         return onlyfile
 
@@ -47,6 +51,10 @@ class client_gui:
         # SetLight
         self.setlight_label.grid_forget()
         self.om_setlight.grid_forget()
+
+        # SetConfiguration
+        self.setconfiguration_label.grid_forget()
+        self.om_setconfiguration.grid_forget()
 
         # SetNotificationMask
         self.event_label.grid_forget()
@@ -73,12 +81,22 @@ class client_gui:
                 #Update OptionMenu elements
                 setlight_menu = self.om_setlight["menu"]
                 setlight_menu.delete(0, "end")
-                self.om_options = client_gui.list_dir_files("SetLight","")
-                for string in self.om_options:
+                self.om_setlight_options = client_gui.list_dir_json_files("SetLight","")
+                for string in self.om_setlight_options:
                     setlight_menu.add_command(label=string, 
                              command=lambda value=string: self.setlight_dir.set(value))
                 self.setlight_label.grid(column=0,row=2)  
-                self.om_setlight.grid(column=0,row=3)      
+                self.om_setlight.grid(column=0,row=3)
+            case OslpRequestType.setConfigurationRequest:
+                #Update OptionMenu elements
+                setconfiguration_menu = self.om_setconfiguration["menu"]
+                setconfiguration_menu.delete(0, "end")
+                self.om_setconfiguration_options = client_gui.list_dir_json_files("SetConfiguration","")
+                for string in self.om_setconfiguration_options:
+                    setconfiguration_menu.add_command(label=string, 
+                             command=lambda value=string: self.setconfiguration_dir.set(value))
+                self.setconfiguration_label.grid(column=0,row=2)  
+                self.om_setconfiguration.grid(column=0,row=3) 
             # case OslpRequestType.setConfigurationRequest:
             #     raise NotImplementedError("doit")  
             case OslpRequestType.resumeScheduleRequest:
@@ -165,7 +183,7 @@ class client_gui:
 
         """ SET LIGHT """
         self.setlight_label = tk.Label(self.c_frame, text="Directory with SetLight templates")
-        self.om_setlight_options = client_gui.list_dir_files("SetLight","")
+        self.om_setlight_options = client_gui.list_dir_json_files("SetLight","")
         self.setlight_dir = tk.StringVar(self.c_frame)
         self.setlight_dir.set(self.om_setlight_options[0])
         self.om_setlight = tk.OptionMenu(self.c_frame, self.setlight_dir, *self.om_setlight_options) 
@@ -213,3 +231,12 @@ class client_gui:
         self.immediate_check_box = tk.Checkbutton(self.c_frame, text='Immediate',variable=self.immediate_var, onvalue=True, offvalue=False)
 
         """ RESUME SCHEDULE """
+
+        """ SET CONFIGURATION """
+        self.setconfiguration_label = tk.Label(self.c_frame, text="Directory with SetConfiguration templates")
+        self.om_setconfiguration_options = client_gui.list_dir_json_files("SetConfiguration","")
+        self.setconfiguration_dir = tk.StringVar(self.c_frame)
+        self.setconfiguration_dir.set(self.om_setconfiguration_options[0])
+        self.om_setconfiguration = tk.OptionMenu(self.c_frame, self.setconfiguration_dir, *self.om_setconfiguration_options) 
+
+        """ SET CONFIGURATION """

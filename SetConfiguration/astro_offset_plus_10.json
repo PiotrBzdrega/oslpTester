@@ -1,0 +1,35 @@
+{
+ "lightType": "RELAY",
+ "relayConfiguration": {
+  "addressMap": [
+   {
+    "index": "Ag==",
+    "address": "AA==",
+    "relayType": "LIGHT"
+   },
+   {
+    "index": "Aw==",
+    "address": "AQ==",
+    "relayType": "LIGHT"
+   },
+   {
+    "index": "BA==",
+    "address": "Ag==",
+    "relayType": "LIGHT"
+   }
+  ]
+ },
+ "isDhcpEnabled": false,
+ "communicationTimeout": 20,
+ "communicationNumberOfRetries": 3,
+ "communicationPauseTimeBetweenConnectionTrials": 20,
+ "ospgIpAddress": "rBRJIQ==",
+ "osgpPortNumber": 12123,
+ "isTestButtonEnabled": true,
+ "isAutomaticSummerTimingEnabled": true,
+ "astroGateSunRiseOffset": 10,
+ "astroGateSunSetOffset": 10,
+ "relayRefreshing": true,
+ "summerTimeDetails": "0360100",
+ "winterTimeDetails": "1060200"
+}

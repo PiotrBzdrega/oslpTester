@@ -52,8 +52,9 @@ def prepareMessageType(client_states:client_gui.client_gui):
         case OslpRequestType.setScheduleRequest:
             schedule = oslp_pb2.SetScheduleRequest()
             dir=client_states.schedule_dir.get()
-            partial_schedule = client_states.list_dir_files("SetSchedule",dir)
-
+            partial_schedule = client_states.list_dir_json_files("SetSchedule",dir)
+            # print(f"partial_schedule: {partial_schedule}")
+            #TODO: missing handling for multiple files
             with open(partial_schedule[0], "r") as f:
                 json_text = f.read()
                 # Parse JSON into the Protobuf message
@@ -64,7 +65,14 @@ def prepareMessageType(client_states:client_gui.client_gui):
         case OslpRequestType.getConfigurationRequest:
             msg.getConfigurationRequest.CopyFrom(oslp_pb2.GetConfigurationRequest())
         case OslpRequestType.setConfigurationRequest:
-            raise NotImplementedError("doit")
+            configuration = oslp_pb2.SetConfigurationRequest()
+
+            with open(client_states.configuration_dir.get(), "r") as f:
+                json_set_configuration = f.read()
+                # Parse JSON into the Protobuf message
+                Parse(json_set_configuration, configuration)
+                msg.setConfigurationRequest.CopyFrom(configuration)
+
         case OslpRequestType.setRebootRequest:
             msg.setRebootRequest.CopyFrom(oslp_pb2.SetRebootRequest())
         case OslpRequestType.setTransitionRequest:

@@ -1,0 +1,35 @@
+{
+  "schedules": [{
+    "weekday": "ALL",
+    "actionTime": "SUNRISE",
+    "window": {
+      "minutesBefore": 30,
+      "minutesAfter": 30
+    },
+    "value": [{
+      "index": "AA==",
+      "on": false
+    }],
+    "triggerType": "LIGHT_TRIGGER",
+    "index": 0
+    }, {
+    "weekday": "ALL",
+    "actionTime": "SUNSET",
+    "window": {
+      "minutesBefore": 30,
+      "minutesAfter": 30
+    },
+    "value": [{
+      "index": "AA==",
+      "on": true
+    }],
+    "triggerType": "LIGHT_TRIGGER",
+    "index": 0
+    }],
+    "pageInfo": {
+    "currentPage": 1,
+    "pageSize": 2,
+    "totalPages": 1
+  },
+  "scheduleType": "LIGHT"
+}

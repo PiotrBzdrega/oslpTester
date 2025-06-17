@@ -2,6 +2,7 @@ import oslp.protocol as protocol
 import gui
 import test
 import tkinter as tk
+import os
 from signal import signal, SIGPIPE, SIG_IGN
 
 if __name__ == "__main__":
@@ -27,8 +28,8 @@ if __name__ == "__main__":
     else:
         root = tk.Tk()
         isTLS = True
-        oslpInstance = protocol.protocol("0.0.0.0",12123,"172.20.73.33",12125,isTLS,root)
-
+        device_server_port = 22125 if isTLS else 12125
+        oslpInstance = protocol.protocol("0.0.0.0",12123,"172.20.73.36",device_server_port,isTLS,root)
         
         def on_window_close():
             oslpInstance.stop_server()  # First action

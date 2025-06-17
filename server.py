@@ -98,9 +98,31 @@ class server:
                 readable, _, _ = select.select([server_socket, self.wakeup_r], [], [])
                 for sock in readable:
                     if sock is server_socket:
-                        client_socket, client_address = server_socket.accept()
-                        print(f"Connection from {client_address}")
-                        self.handler(client_socket)
+                        # when client don't have valid certificate, the server_socket.accept() will raise an exception
+                        client_socket = None
+                        try:
+                            client_socket, client_address = server_socket.accept()
+                            print(f"Connection from {client_address}")
+                            self.handler(client_socket)
+                        except ssl.SSLError as e:
+                            print(f"SSL error: {e}")
+                        except socket.error as e:
+                            print(f"Socket Error: {e}")
+                        except Exception as e:
+                            print(f"Unexpected Error: {e}")
+                        
+                        finally:
+                            if client_socket is None or client_socket.fileno() == -1:
+                                print("No client socket to handle")
+                                continue
+                            if self.tls:
+                                if isinstance(client_socket, ssl.SSLSocket):
+                                    print("Client socket is an SSLSocket")
+                                    # client_socket.shutdown(socket.SHUT_RDWR)
+                                    client_socket.unwrap()
+
+                            if client_socket.fileno() != -1:
+                                client_socket.close()
             print("Server thread is stopping")
             self.wakeup_w.close()
             self.wakeup_r.close()

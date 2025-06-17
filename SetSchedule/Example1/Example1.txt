@@ -1,0 +1,4 @@
+Example 1
+
+all relays all days switching off by light trigger at sunrise
+all relays all days switching on by light trigger at sunset

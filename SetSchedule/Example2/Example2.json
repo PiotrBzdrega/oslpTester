@@ -1,0 +1,47 @@
+{
+  "schedules": [{
+    "weekday": "ALL",
+    "actionTime": "SUNRISE",
+    "value": [{
+      "index": "AA==",
+      "on": false
+    }],
+    "triggerType": "ASTRONOMICAL",
+    "index": 0
+    }, {
+    "weekday": "ALL",
+    "actionTime": "SUNSET",
+    "value": [{
+      "index": "AA==",
+      "on": true
+    }],
+    "triggerType": "ASTRONOMICAL",
+    "index": 0
+    }, {
+    "weekday": "ALL",
+    "actionTime": "ABSOLUTETIME",
+    "time": "230000",
+    "value": [{
+      "index": "Ag==",
+      "on": false
+    }],
+    "minimumLightsOn": 1800,
+    "index": 0
+    }, {
+    "weekday": "ALL",
+    "actionTime": "ABSOLUTETIME",
+    "time": "060000",
+    "value": [{
+      "index": "Ag==",
+      "on": true
+    }],
+    "minimumLightsOn": 1800,
+    "index": 0
+    }],
+    "pageInfo": {
+    "currentPage": 1,
+    "pageSize": 4,
+    "totalPages": 1
+  },
+  "scheduleType": "LIGHT"
+}

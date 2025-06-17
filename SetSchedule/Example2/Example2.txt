@@ -1,0 +1,7 @@
+Example 2 
+
+all relays all days switching off at calculated sunrise
+all relays all days switching on at calculated sunset
+relay 2 all days switching off at 23:00:00 (local time) when estimated minimum on time is at least 30 min 
+(relay 2 should not  switch on at calculated sunset when estimated minimum on time is less than 30 min)
+relay 2 all days switching on at 06:00:00 (local time) when estimated minimum on time is at least 30 min
