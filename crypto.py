@@ -4,9 +4,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 
-PRIVATE_KEY = "/keys/platform_ecdsa_private.pem" #"/mnt/nvm/OSLitaP/keys/private_sim_key.der"
-PUBLIC_KEY = "/keys/device_ecdsa_public.pem"#"/mnt/nvm/OSLitaP/keys/public_sim_key.der" 
-
 def create_hash(data):
     # Create a SHA-256 hash object
     digest = hashes.Hash(hashes.SHA256())
@@ -45,9 +42,9 @@ def verify(key,data,signature):
         print("Signature is invalid:", e)
         return False
 
-def signatureTest():
-    public_key = load_key(PUBLIC_KEY,public=True)
-    private_key =load_key(PRIVATE_KEY,public=False)
+def signatureTest(private_path,public_path):
+    public_key = load_key(public_path,public=True)
+    private_key =load_key(private_path,public=False)
 
     print(public_key)
     print(private_key)

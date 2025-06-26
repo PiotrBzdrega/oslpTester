@@ -21,8 +21,12 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip3 install protobuf==6.31.1
 pip3 install cryptography
+pip3 install paramiko
 # generate protobuf contract
 protoc --python_out=. oslp.proto
+
+#make directory keys and certs in oslpTester/
+mkdir keys certs
 
 ```
 ### vscode

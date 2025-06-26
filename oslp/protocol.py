@@ -29,13 +29,18 @@ class protocol:
         self.s_ip=s_ip
         self.s_port=s_port
 
+        cwd = os.getcwd()
+
+        # self.PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+        # self.PUBLIC_KEY = os.getenv("PUBLIC_KEY")
+        # print(self.PRIVATE_KEY)
 
         # Create a custom virtual event
         self.root.bind("<<CheckQueue>>", self.handle_queue)
 
         self.retrieveKey()
         self.tls = tls
-        self.dev = device.device(crypto.load_key(crypto.PUBLIC_KEY, public=True))
+        self.dev = device.device(crypto.load_key(os.getenv("PUBLIC_KEY"), public=True))
 
         self.server = server.server(self.server_handler,self.s_ip,self.s_port,self.tls,self.queue,self.root)
         # self.server = None
@@ -46,7 +51,7 @@ class protocol:
         self.client=client.client(self.prepareRequest,envelope.messageValidator,self.handleResponse,self.dev.setSequenceNumber,c_ip,c_port,self.tls,self.queue,self.root)
 
         self.server_gui()
-        self.client_states=client_gui.client_gui(self.root,self.client.start)
+        self.client_states=client_gui.client_gui(self.root,self.start_client)
 
 
     def handle_queue(self,event):
@@ -54,6 +59,9 @@ class protocol:
         print("handle_queue")
         msg = self.queue.get()
         msg()
+
+    def start_client(self):
+        self.client.start(self.client_states.ip_entry.get(),22125)
 
     def start_server(self):
 
@@ -85,7 +93,7 @@ class protocol:
         # t1.join() #TODO:needed?
 
     def retrieveKey(self):
-        self.privateKey = crypto.load_key(crypto.PRIVATE_KEY, public=False)
+        self.privateKey = crypto.load_key(os.getenv("PRIVATE_KEY"), public=False)
 
     def prepareRequest(self) -> envelope.envelope:
         request_payload = message.prepareMessageType(self.client_states)
@@ -246,8 +254,6 @@ def message2():
 
     print("decoded",env2.payload)
     public = privat.public_key()
-
-    # public = crypto.load_key(crypto.PUBLIC_KEY, public=True)
 
     if env2.validate(public):
         print("validated")

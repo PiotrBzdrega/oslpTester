@@ -1,8 +1,10 @@
 import oslp.device as device
 import crypto
+import os
 
 def testCheckwindow():
-    dev = device.device(crypto.load_key(crypto.PUBLIC_KEY, public=True))
+    cwd = os.getcwd()
+    dev = device.device(crypto.load_key(os.getenv("PUBLIC_KEY"), public=True))
 
     dev.setSequenceNumber(1)
 

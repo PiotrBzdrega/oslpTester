@@ -2,6 +2,7 @@ from datetime import datetime,timezone
 import tkinter as tk
 from oslp.types import *
 import os
+import json
 
 class client_gui:
     def __init__(self,root,client_request):
@@ -11,8 +12,7 @@ class client_gui:
 
     @staticmethod
     def list_directories(directory:str):
-        current_path = os.getcwd()
-        schedules_path = os.path.join(current_path,directory)
+        schedules_path = os.path.join(os.getenv("ROOT_APP"),directory)
         onlydir = [dir for dir in os.listdir(schedules_path) if os.path.isdir(os.path.join(schedules_path, dir))]
         # print(schedules_path)
         # print(onlydir)
@@ -20,8 +20,7 @@ class client_gui:
     
     @staticmethod
     def list_dir_json_files(parent_dir:str,schedule_dir):
-        current_path = os.getcwd()
-        schedules_path = os.path.join(current_path,parent_dir,schedule_dir)
+        schedules_path = os.path.join(os.getenv("ROOT_APP"),parent_dir,schedule_dir)
         # print(schedules_path)
         onlyfile = [
             os.path.join(schedules_path, filename) 
@@ -126,6 +125,46 @@ class client_gui:
             # case OslpRequestType.setRebootRequest:
             # do nix
 
+    def read_cache(self):
+        # Read JSON data from a file
+        if os.path.exists(os.getenv("NET_CACHE")):
+            try:
+                with open(os.getenv("NET_CACHE"), 'r') as file:
+                    cfg = json.load(file)
+                print(cfg)
+                self.stored_ip = cfg['ip']
+            except json.JSONDecodeError as e:
+                print(f"❌ Invalid JSON: {e}")
+            except FileNotFoundError:
+                print("❌ File not found.")
+        #         self.update_cache("0.0.0.0")
+        # else:
+        #     self.update_cache("0.0.0.0")
+
+    def update_cache(self,new_text):
+        if self.stored_ip != new_text:    
+            data = {
+                "ip"    : new_text
+            }
+            with open(os.getenv("NET_CACHE"), 'w', encoding='utf-8') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+            self.stored_ip = new_text
+
+    def validate_ip(self,new_text):
+        # Check if the new text is a valid partial IP
+        parts = new_text.split('.')
+        if len(parts) > 4:
+            return False  # Too many parts
+
+        for part in parts:
+            if not part.isdigit() and part != "":  # Allow empty during typing
+                return False
+            if part and (int(part) < 0 or int(part) > 255):
+                return False
+        
+        self.update_cache(new_text)
+        return True
+
     def init_fields(self):
         self.c_frame = tk.LabelFrame(self.root, text="Client")
         self.c_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
@@ -147,6 +186,34 @@ class client_gui:
 
         self.send_request_button = tk.Button(self.c_frame, text="Send request", command=self.client_request)
         self.send_request_button.grid(column=1,row=0)
+
+        """ CACHE NETWORK """
+        self.stored_ip ="0.0.0.0"
+        self.read_cache()
+
+        # def format_ip(event=None):
+        #     current_text = self.ip_entry.get()
+        #     if current_text.count('.') == 3 and len(current_text.split('.')) == 4:
+        #         # If it's a complete IP, process it (e.g., store or print)
+        #         print("Valid IP:", current_text)
+        #     else:
+        #         # Optional: Auto-insert '.' after 3 digits
+        #         if len(current_text.replace('.', '')) % 3 == 0 and current_text[-1] != '.':
+        #             self.ip_entry.insert(tk.END, '.')
+
+        # Register validation function
+        vcmd = (self.root.register(self.validate_ip), '%P')
+
+        self.ip_entry = tk.Entry(
+            self.c_frame,
+            validate="key", # Validate on every keystroke
+            validatecommand=vcmd,
+            width=15,
+            font=('Arial', 12))
+        self.ip_entry.grid(column=2,row=0)
+        self.ip_entry.insert(-1,self.stored_ip)
+
+        """ CACHE NETWORK """
 
         """ SET TRANSITION """
         def validate_transition(new_text):

@@ -1,3 +1,6 @@
 .venv/
 __pycache__/
 cache.json
+keys/
+certs/
+net_cache.json

@@ -5,10 +5,7 @@ from tkinter import ttk
 from queue import Queue
 import cancellation
 import select
-
-ca_root_cert  = "/certs/ca.crt"         # for client validation
-platform_cert = "/certs/platform.crt"   # client/server certificate
-platform_key  = "/certs/platform.key"   # client/server certificate private key
+import os
 
 class server:
     def __init__(self, handler, host="0.0.0.0", port=12123, tls=True, queue: Queue =None,root:tk.Tk=None):
@@ -71,13 +68,13 @@ class server:
                 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 
                 # Load server certificate and private key
-                context.load_cert_chain(certfile=platform_cert, keyfile=platform_key)
+                context.load_cert_chain(certfile=os.getenv("PLATFORM_CERT"), keyfile=os.getenv("PLATFORM_KEY"))
 
                 # Require client certificate for mutual TLS
                 context.verify_mode = ssl.CERT_REQUIRED
 
                 # Load the CA certificate used to verify client certs
-                context.load_verify_locations(cafile=ca_root_cert)
+                context.load_verify_locations(cafile=os.getenv("CA_ROOT_CERT"))
 
                 # Optional: restrict to TLS 1.3 only
                 context.minimum_version = ssl.TLSVersion.TLSv1_3
