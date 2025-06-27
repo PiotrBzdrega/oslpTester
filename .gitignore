@@ -4,3 +4,4 @@ cache.json
 keys/
 certs/
 net_cache.json
+oslp_cache.json

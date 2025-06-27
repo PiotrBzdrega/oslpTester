@@ -23,7 +23,7 @@ import client_gui
 class protocol:
     def __init__(self,s_ip: str, s_port: int, c_ip: str, c_port: int, tls: bool, root):
         self.root = root
-        self.root.geometry("600x600")
+        self.root.geometry("800x600")
         self.root.title("OSLP Simulator")
         self.queue = Queue()
         self.s_ip=s_ip
@@ -61,7 +61,7 @@ class protocol:
         msg()
 
     def start_client(self):
-        self.client.start(self.client_states.ip_entry.get(),22125)
+        self.client.start(self.client_states.ip_entry.get(),int(self.client_states.port_entry.get()))
 
     def start_server(self):
 

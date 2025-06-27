@@ -19,6 +19,7 @@ if __name__ == "__main__":
     os.environ["PLATFORM_CERT"] = os.path.join(app_root,"certs/platform.crt") # client/server certificate
     os.environ["PLATFORM_KEY"] = os.path.join(app_root,"certs/platform.key") # client/server certificate private key
     os.environ["NET_CACHE"] = os.path.join(app_root,"net_cache.json") # file to store last used ip
+    os.environ["OSLP_CACHE"] = os.path.join(app_root,"oslp_cache.json") # file to store oslp registration details
 
     testing = False
     if testing:

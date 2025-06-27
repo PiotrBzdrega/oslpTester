@@ -3,6 +3,7 @@ import tkinter as tk
 from oslp.types import *
 import os
 import json
+import ipaddress
 
 class client_gui:
     def __init__(self,root,client_request):
@@ -133,18 +134,50 @@ class client_gui:
                     cfg = json.load(file)
                 print(cfg)
                 self.stored_ip = cfg['ip']
+                self.stored_port = cfg['port']
             except json.JSONDecodeError as e:
                 print(f"❌ Invalid JSON: {e}")
             except FileNotFoundError:
                 print("❌ File not found.")
-        #         self.update_cache("0.0.0.0")
-        # else:
-        #     self.update_cache("0.0.0.0")
 
-    def update_cache(self,new_text):
-        if self.stored_ip != new_text:    
+    def is_valid_port(self,port):
+        return 0 <= int(port) <= 65535
+        
+    def update_cache_port(self,new_text):
+        if self.stored_port != new_text and self.is_valid_port(new_text):    
             data = {
-                "ip"    : new_text
+                "ip"    : self.stored_ip,
+                "port"  : new_text
+            }
+            with open(os.getenv("NET_CACHE"), 'w', encoding='utf-8') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+            self.stored_port = new_text
+
+    def validate_port(self,new_value):
+        if not new_value:  # Allow empty field
+            return True
+        try:
+            port = int(new_value)
+            if len(new_value)<6 and self.is_valid_port(port):
+                self.update_cache_port(new_value)
+                return True
+            else:
+                return False
+        except ValueError:
+            return False
+
+    def is_valid_ip(self,ip):
+        try:
+            ipaddress.ip_address(ip)
+            return True
+        except ValueError:
+            return False
+
+    def update_cache_ip(self,new_text):
+        if self.stored_ip != new_text and self.is_valid_ip(new_text):    
+            data = {
+                "ip"    : new_text,
+                "port"  : self.stored_port
             }
             with open(os.getenv("NET_CACHE"), 'w', encoding='utf-8') as file:
                 json.dump(data, file, ensure_ascii=False, indent=4)
@@ -162,7 +195,8 @@ class client_gui:
             if part and (int(part) < 0 or int(part) > 255):
                 return False
         
-        self.update_cache(new_text)
+        if self.is_valid_ip(new_text):
+            self.update_cache_ip(new_text)
         return True
 
     def init_fields(self):
@@ -189,6 +223,7 @@ class client_gui:
 
         """ CACHE NETWORK """
         self.stored_ip ="0.0.0.0"
+        self.stored_port ="22125"
         self.read_cache()
 
         # def format_ip(event=None):
@@ -201,16 +236,32 @@ class client_gui:
         #         if len(current_text.replace('.', '')) % 3 == 0 and current_text[-1] != '.':
         #             self.ip_entry.insert(tk.END, '.')
 
-        # Register validation function
-        vcmd = (self.root.register(self.validate_ip), '%P')
+        # Register validation function for ip
+        vcmd_port = (self.root.register(self.validate_port), '%P')
 
+        self.port_label = tk.Label(self.c_frame, text="Device port:")
+        self.port_label.grid(column=2,row=2)
+        self.port_entry = tk.Entry(
+            self.c_frame,
+            validate="key", # Validate on every keystroke
+            validatecommand=vcmd_port,
+            width=6,
+            font=('Arial', 12))
+        self.port_entry.grid(column=2,row=3)
+        self.port_entry.insert(-1,self.stored_port)
+
+        # Register validation function for ip
+        vcmd_ip = (self.root.register(self.validate_ip), '%P')
+
+        self.ip_label = tk.Label(self.c_frame, text="Device IPv4:")
+        self.ip_label.grid(column=2,row=0)
         self.ip_entry = tk.Entry(
             self.c_frame,
             validate="key", # Validate on every keystroke
-            validatecommand=vcmd,
+            validatecommand=vcmd_ip,
             width=15,
             font=('Arial', 12))
-        self.ip_entry.grid(column=2,row=0)
+        self.ip_entry.grid(column=2,row=1)
         self.ip_entry.insert(-1,self.stored_ip)
 
         """ CACHE NETWORK """

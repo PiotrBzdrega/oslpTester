@@ -4,7 +4,6 @@ import os
 
 MAX_SEQUENCE_NUMBER = pow(2,16) - 1
 SEQUENCE_WINDOW = 6
-CFG_FILE = 'cache.json'
 
 class device:
     def __init__(self,publicKey):
@@ -19,9 +18,9 @@ class device:
     
     def readConfig(self):
         # Read JSON data from a file
-        if os.path.exists(CFG_FILE):
+        if os.path.exists(os.getenv("OSLP_CACHE")):
             try:
-                with open(CFG_FILE, 'r') as file:
+                with open(os.getenv("OSLP_CACHE"), 'r') as file:
                     cfg = json.load(file)
                 print(cfg)
                 self.deviceUid = bytearray.fromhex(cfg['deviceUid'])
@@ -41,18 +40,18 @@ class device:
             "randomPlatform"        : self.randomPlatform,
             "sequenceNumber"        : 0
         }
-        with open(CFG_FILE, 'w', encoding='utf-8') as file:
+        with open(os.getenv("OSLP_CACHE"), 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
 
     def updateSequenceNumberInConfig(self,sequenceNumber : int):
         # Read JSON data from a file
-        if os.path.exists(CFG_FILE):
+        if os.path.exists(os.getenv("OSLP_CACHE")):
             try:
-                with open(CFG_FILE, 'r') as file:
+                with open(os.getenv("OSLP_CACHE"), 'r') as file:
                     cfg = json.load(file)
                 cfg['sequenceNumber'] = sequenceNumber
 
-                with open(CFG_FILE, 'w', encoding='utf-8') as file:
+                with open(os.getenv("OSLP_CACHE"), 'w', encoding='utf-8') as file:
                     json.dump(cfg, file, ensure_ascii=False, indent=4)
             except json.JSONDecodeError as e:
                 print(f"❌ Invalid JSON: {e}")
