@@ -36,14 +36,16 @@ CTRL+SHIFT+P
 Python:Select Interpreter
 ```
 
-
 ### connect to server
 ```shell
 nc -v localhost 12123
 ```
 
-
 ### deactivate virtual environment
 ```shell
 deactivate
 ```
+
+### TODO:
+* add TLS checkbox for client and server independently
+* 

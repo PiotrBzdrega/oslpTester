@@ -64,6 +64,11 @@ class server:
             #     except ValueError:
             #         print(f"  ❌ {version.name} not supported")            
 
+            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Allow reuse of address
+            server_socket.bind((self.host, self.port))
+            server_socket.listen(1)
+            print(f"Server listening on {self.host}:{self.port}...")
+
             if self.tls:
                 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 
@@ -79,12 +84,6 @@ class server:
                 # Optional: restrict to TLS 1.3 only
                 context.minimum_version = ssl.TLSVersion.TLSv1_3
                 context.maximum_version = ssl.TLSVersion.TLSv1_3
-
-                server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Allow reuse of address
-                server_socket.bind((self.host, self.port))
-                server_socket.listen(1)
-                print(f"Server listening on {self.host}:{self.port}...")
-                print("Wrap TCP socket in ssl context")
 
                 # wrap an existing socket with SSLContext
                 server_socket = context.wrap_socket(server_socket, server_side=True)

@@ -154,7 +154,7 @@ class protocol:
             except Exception as e:
                 print(f"Error: {e}")
             finally:
-                print("Close the connection1")
+                print("Connection closed")
                 if self.tls:
                     client_socket.unwrap() # Sends TLS close_notify, converts socket to plaintext
 
@@ -166,9 +166,9 @@ class protocol:
             
 
 
-        for n in [0,1,2,3]:
-            print(n)
-            time.sleep(1)
+        # for n in [0,1,2,3]:
+        #     print(n)
+        #     time.sleep(1)
 
     def server_gui(self):
         self.s_frame = ttk.LabelFrame(self.root, text="Server")
