@@ -36,7 +36,7 @@ def verify(key,data,signature):
             data,
             ec.ECDSA(hashes.SHA256())
         )
-        print("Signature is valid.")
+        # print("Signature is valid.")
         return True
     except Exception as e:
         print("Signature is invalid:", e)

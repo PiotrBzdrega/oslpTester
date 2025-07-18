@@ -8,11 +8,9 @@ import select
 import os
 
 class server:
-    def __init__(self, handler, host="0.0.0.0", port=12123, tls=True, queue: Queue =None,root:tk.Tk=None):
+    def __init__(self, handler, queue: Queue =None,root:tk.Tk=None):
         self.ct = cancellation.CancellationToken()
-        self.host = host
-        self.port = port
-        self.tls = tls
+        self.host = "0.0.0.0"
         self.queue = queue
         self.root = root
         self.handler = handler
@@ -28,9 +26,9 @@ class server:
         """Trigger the select() to wake up"""
         self.wakeup_w.send(b'\x00')  # Send a dummy byte
 
-    def gui_update(self,func):
-        self.queue.put(func)
-        self.root.event_generate("<<CheckQueue>>")
+    # def gui_update(self,func):
+    #     self.queue.put(func)
+    #     self.root.event_generate("<<CheckQueue>>")
 
     # def gui_init(self):
     #     self.frame = ttk.LabelFrame(self.root, text="Server")
@@ -46,7 +44,7 @@ class server:
     # def add_handler(self, handler):
     #     self.handler = handler
 
-    def start(self):
+    def start(self, port,tls):
 
         self.ct.reset()
         self.wakeup_r, self.wakeup_w = socket.socketpair()
@@ -65,11 +63,11 @@ class server:
             #         print(f"  ❌ {version.name} not supported")            
 
             server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Allow reuse of address
-            server_socket.bind((self.host, self.port))
+            server_socket.bind((self.host, port))
             server_socket.listen(1)
-            print(f"Server listening on {self.host}:{self.port}...")
+            print(f"Server listening on {self.host}:{port} tls:{tls}...")
 
-            if self.tls:
+            if tls:
                 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 
                 # Load server certificate and private key
@@ -99,8 +97,9 @@ class server:
                         try:
                             client_socket, client_address = server_socket.accept()
                             print(f"Connection from {client_address}")
-                            self.handler(client_socket)
+                            self.handler(client_socket,tls)
                         except ssl.SSLError as e:
+                            print(f"Failed connection from {client_address}")
                             print(f"SSL error: {e}")
                         except socket.error as e:
                             print(f"Socket Error: {e}")
@@ -111,7 +110,7 @@ class server:
                             if client_socket is None or client_socket.fileno() == -1:
                                 print("No client socket to handle")
                                 continue
-                            if self.tls:
+                            if tls:
                                 if isinstance(client_socket, ssl.SSLSocket):
                                     print("Client socket is an SSLSocket")
                                     # client_socket.shutdown(socket.SHUT_RDWR)

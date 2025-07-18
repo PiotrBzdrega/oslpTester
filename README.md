@@ -48,4 +48,6 @@ deactivate
 
 ### TODO:
 * add TLS checkbox for client and server independently
-* 
+* customized port for server
+* animation that server is running
+* use logger instead print or merged solution to avoid 

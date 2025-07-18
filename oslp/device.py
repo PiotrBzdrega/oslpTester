@@ -76,7 +76,7 @@ class device:
         return self.deviceUid
 
     def setSequenceNumber(self,sequence_number : int):
-        print(f"New sequence number {sequence_number}")
+        # print(f"New sequence number {sequence_number}")
         self.sequenceNumber = sequence_number
         self.updateSequenceNumberInConfig(sequence_number)
 

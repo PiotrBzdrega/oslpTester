@@ -5,12 +5,10 @@ from oslp.types import *
 import client_gui
 from google.protobuf.json_format import Parse
 
-# OslpChannelHandlerServer.java channelRead0
-
-# integer_value.to_bytes(length=length, byteorder='big', signed=False)
-
 def prepareMessageType(client_states:client_gui.client_gui):
-    print(f"function: {prepareMessageType.__name__}({type})")
+    if not hasattr(prepareMessageType, "msg_remainder"):
+        prepareMessageType.msg_remainder = []  # Initialize
+        print("initialization msg_remainder")
     msg = oslp_pb2.Message()    
     match client_states.oslp_type.get():
         case OslpRequestType.startSelfTestRequest:
@@ -53,13 +51,15 @@ def prepareMessageType(client_states:client_gui.client_gui):
             schedule = oslp_pb2.SetScheduleRequest()
             dir=client_states.schedule_dir.get()
             partial_schedule = client_states.list_dir_json_files("SetSchedule",dir)
-            # print(f"partial_schedule: {partial_schedule}")
+            print(f"partial_schedule: {partial_schedule}")
             #TODO: missing handling for multiple files
-            with open(partial_schedule[0], "r") as f:
-                json_text = f.read()
-                # Parse JSON into the Protobuf message
-                Parse(json_text, schedule)
-                msg.setScheduleRequest.CopyFrom(schedule)
+            for item in partial_schedule:
+                
+                with open(partial_schedule[0], "r") as f:
+                    json_text = f.read()
+                    # Parse JSON into the Protobuf message
+                    Parse(json_text, schedule)
+                    msg.setScheduleRequest.CopyFrom(schedule)
 
             # raise NotImplementedError("doit")
         case OslpRequestType.getConfigurationRequest:
@@ -91,9 +91,8 @@ def prepareMessageType(client_states:client_gui.client_gui):
 
         case _:
             raise Exception(f"Not correct message type {prepareMessageType.__name__}")
-    print("Prepared message type")
-    print(msg)
-    return msg
+    # print("Prepared message type")
+    return (msg, len(prepareMessageType.msg_remainder) > 0) # pass information if there are still remaining parts of message
 
 def checkResponse(device_uid,sequence_number,payload,dev):
     if ( 
@@ -112,8 +111,7 @@ def checkResponse(device_uid,sequence_number,payload,dev):
     ):
         if dev.checkSequenceNumber(sequence_number):
             dev.setSequenceNumber(sequence_number)
-            print("Received message")
-            print(payload)
+            # print("Received message")
     else:
         raise Exception(f"Not correct message type {checkResponse.__name__}")     
 
@@ -152,14 +150,14 @@ def handleConfirmRegisterDeviceRequest(device_uid,sequence_number,confirmRegiste
 
     if (dev.checkDeviceAndPlatformRandom(confirmRegisterDeviceRequest.randomDevice,confirmRegisterDeviceRequest.randomPlatform) and
         dev.checkSequenceNumber(sequence_number)):
-            dev.setSequenceNumber(sequence_number)
-            response.status = oslp_pb2.Status.OK
-            response.randomDevice = dev.getRandomDevice()
-            response.randomPlatform = dev.getRandomPlatform()
-            response.sequenceWindow = device.SEQUENCE_WINDOW
-            return msg
+        dev.setSequenceNumber(sequence_number)
+        response.status = oslp_pb2.Status.OK
     else:
         response.status = oslp_pb2.Status.REJECTED
+
+    response.randomDevice = dev.getRandomDevice()
+    response.randomPlatform = dev.getRandomPlatform()
+    response.sequenceWindow = device.SEQUENCE_WINDOW
 
     return msg
 

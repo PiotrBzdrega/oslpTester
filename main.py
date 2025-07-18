@@ -18,7 +18,8 @@ if __name__ == "__main__":
     os.environ["CA_ROOT_CERT"] = os.path.join(app_root,"certs/ca.crt") # for client validation
     os.environ["PLATFORM_CERT"] = os.path.join(app_root,"certs/platform.crt") # client/server certificate
     os.environ["PLATFORM_KEY"] = os.path.join(app_root,"certs/platform.key") # client/server certificate private key
-    os.environ["NET_CACHE"] = os.path.join(app_root,"net_cache.json") # file to store last used ip
+    os.environ["CLIENT_NET_CACHE"] = os.path.join(app_root,"client_net_cache.json") # file to store last used ip and port
+    os.environ["SERVER_NET_CACHE"] = os.path.join(app_root,"server_net_cache.json") # file to store last used port
     os.environ["OSLP_CACHE"] = os.path.join(app_root,"oslp_cache.json") # file to store oslp registration details
 
     testing = False
@@ -26,9 +27,7 @@ if __name__ == "__main__":
         test.testCheckwindow()
     else:
         root = tk.Tk()
-        isTLS = True
-        device_server_port = 22125 if isTLS else 12125
-        oslpInstance = protocol.protocol("0.0.0.0",12123,"172.20.73.36",device_server_port,isTLS,root)
+        oslpInstance = protocol.protocol(root)
         
         def on_window_close():
             oslpInstance.stop_server()  # First action

@@ -6,10 +6,7 @@ from oslp.types import OslpRequestType
 import os
 
 class client:
-    def __init__(self, prepare_request_handler, msg_validator, response_handler, set_sequence_number, server_ip="0.0.0.0", port=12125, tls=True, queue: Queue =None,root:tk.Tk=None):
-        self.server_ip = server_ip
-        self.port = port
-        self.tls = tls
+    def __init__(self, prepare_request_handler, msg_validator, response_handler, set_sequence_number, queue: Queue =None,root:tk.Tk=None):
         self.queue = queue
         self.root = root
         self.context:ssl.SSLContext = None
@@ -26,11 +23,11 @@ class client:
     # def on_option_selected(self):
     #     self.selected_label.config(text=f'Selected: {self.oslp_type.get()}')
 
-    def start(self, remote_ip, remote_port):
+    def start(self, remote_ip, remote_port,tls):
 
-        print(remote_ip)
-        print(remote_port)
-        if self.tls and self.context == None:
+        # print(remote_ip)
+        # print(remote_port)
+        if tls and self.context == None:
 
             context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 
@@ -54,49 +51,56 @@ class client:
 
             client_socket.settimeout(15)
 
-            # wrap an existing socket with SSLContext
-            client_socket = context.wrap_socket(client_socket, server_side=False, server_hostname=remote_ip)
-            # client_socket = context.wrap_socket(client_socket, server_side=False)
+            if tls:
+                # wrap an existing socket with SSLContext
+                client_socket = context.wrap_socket(client_socket, server_side=False, server_hostname=remote_ip)
+                # client_socket = context.wrap_socket(client_socket, server_side=False)
 
-        try:
-            client_socket.connect((remote_ip,remote_port))
-            print(f"Successfully connected to {remote_ip} with TLS 1.3")
-            print(f"Negotiated cipher: {client_socket.cipher()}")
-            print(f"Using protocol: {client_socket.version()}")
-            return self.exchange(client_socket)
-        except socket.timeout:
-            client_socket.close()
-            raise Exception(f"Connection to {remote_ip} timed out ")
-        except Exception as e:
-            client_socket.close()
-            raise Exception(f"Failed to establish secure connection: {str(e)}")      
-
-                # while not self.ct.is_canceled():
-                #     client_socket, client_address = server_socket.accept()
-                #     print(f"Connection from {client_address}")
-                #     self.handler(client_socket)
-                #     print("Server waits for the next request")
-                # print("Server stopped")
+            try:
+                client_socket.connect((remote_ip,remote_port))
+                if tls:
+                    print(f"Successfully connected to {remote_ip} with TLS 1.3")
+                    print(f"Negotiated cipher: {client_socket.cipher()}")
+                    print(f"Using protocol: {client_socket.version()}")
+                
+                return self.exchange(client_socket,tls)
+            except socket.timeout:
+                client_socket.close()
+                raise Exception(f"Connection to {remote_ip} timed out ")
+            except Exception as e:
+                client_socket.close()
+                raise Exception(f"Failed to establish secure connection: {str(e)}")      
+    
+                    # while not self.ct.is_canceled():
+                    #     client_socket, client_address = server_socket.accept()
+                    #     print(f"Connection from {client_address}")
+                    #     self.handler(client_socket)
+                    #     print("Server waits for the next request")
+                    # print("Server stopped")
             
-    def exchange(self,socket:ssl.SSLSocket):
+    def exchange(self,socket:ssl.SSLSocket,tls):
         buffer = bytearray(4096)  # Create preallocated to store received data
         offset = 0
-        raw_request, sequence_number = self.prepare_request_handler()
         try:
-            socket.sendall(raw_request)
-            # set a new sequence number if the data has been delivered
-            self.set_sequence_number(sequence_number)
             while True:
-                # Receive the response from the server
-                bytes_received = socket.recv_into(memoryview(buffer)[offset:])
-                # print(f"{bytes_received} bytes received from Server") 
-                if bytes_received == 0:
+                raw_request, sequence_number, remaining_parts = self.prepare_request_handler()
+                socket.sendall(raw_request)
+                # set a new sequence number if the data has been delivered
+                self.set_sequence_number(sequence_number)
+                while True:
+                    # Receive the response from the server
+                    bytes_received = socket.recv_into(memoryview(buffer)[offset:])
+                    # print(f"{bytes_received} bytes received from Server") 
+                    if bytes_received == 0:
+                        break
+                    offset += bytes_received
+                    if self.msg_validator(buffer[:offset]):
+                        self.response_handler(buffer[:offset])
+                        break
+                
+                if not remaining_parts:
+                    # All parts has been send
                     break
-                offset += bytes_received
-                if self.msg_validator(buffer[:offset]):
-                    self.response_handler(buffer[:offset])
-                    break
-
 
         except ssl.SSLError as e:
             print(f"SSL error: {e}")
@@ -104,7 +108,7 @@ class client:
             print(f"Error: {e}")
         finally:
             print("Close the connection")            
-            if self.tls:
+            if tls:
                 socket.unwrap() # Sends TLS close_notify, converts socket to plaintext
             # It disables further sends and receives on the socket, but does not close the socket yet. 
             # This is a TCP-level shutdown, not a TLS-level one.

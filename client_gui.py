@@ -128,17 +128,29 @@ class client_gui:
 
     def read_cache(self):
         # Read JSON data from a file
-        if os.path.exists(os.getenv("NET_CACHE")):
+        if os.path.exists(os.getenv("CLIENT_NET_CACHE")):
             try:
-                with open(os.getenv("NET_CACHE"), 'r') as file:
+                with open(os.getenv("CLIENT_NET_CACHE"), 'r') as file:
                     cfg = json.load(file)
                 print(cfg)
-                self.stored_ip = cfg['ip']
-                self.stored_port = cfg['port']
+                self.stored_ip = cfg['ip'] if 'ip' in cfg else "0.0.0.0"
+                self.stored_port = cfg['port'] if 'port' in cfg else "22125"
+                self.stored_tls : bool = cfg['tls'] if 'tls' in cfg else True
             except json.JSONDecodeError as e:
                 print(f"❌ Invalid JSON: {e}")
             except FileNotFoundError:
                 print("❌ File not found.")
+
+    def update_cache_tls(self):
+        if self.stored_tls != self.tls_var:
+            data = {
+                "ip"    : self.stored_ip,
+                "port"  : self.stored_port,
+                "tls"   : self.tls_var.get()
+            }
+            with open(os.getenv("CLIENT_NET_CACHE"), 'w', encoding='utf-8') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+            self.stored_tls = self.tls_var.get()
 
     def is_valid_port(self,port):
         return 0 <= int(port) <= 65535
@@ -147,9 +159,10 @@ class client_gui:
         if self.stored_port != new_text and self.is_valid_port(new_text):    
             data = {
                 "ip"    : self.stored_ip,
-                "port"  : new_text
+                "port"  : new_text,
+                "tls"   : self.stored_tls
             }
-            with open(os.getenv("NET_CACHE"), 'w', encoding='utf-8') as file:
+            with open(os.getenv("CLIENT_NET_CACHE"), 'w', encoding='utf-8') as file:
                 json.dump(data, file, ensure_ascii=False, indent=4)
             self.stored_port = new_text
 
@@ -177,9 +190,10 @@ class client_gui:
         if self.stored_ip != new_text and self.is_valid_ip(new_text):    
             data = {
                 "ip"    : new_text,
-                "port"  : self.stored_port
+                "port"  : self.stored_port,
+                "tls"   : self.stored_tls
             }
-            with open(os.getenv("NET_CACHE"), 'w', encoding='utf-8') as file:
+            with open(os.getenv("CLIENT_NET_CACHE"), 'w', encoding='utf-8') as file:
                 json.dump(data, file, ensure_ascii=False, indent=4)
             self.stored_ip = new_text
 
@@ -218,12 +232,13 @@ class client_gui:
         # self.droplist.pack(pady=20)
         self.droplist.grid(column=0,row=0)
 
-        self.send_request_button = tk.Button(self.c_frame, text="Send request", command=self.client_request)
+        self.send_request_button = tk.Button(self.c_frame, bg="yellow", activebackground="lightyellow", text="Send request", command=self.client_request)
         self.send_request_button.grid(column=1,row=0)
 
         """ CACHE NETWORK """
         self.stored_ip ="0.0.0.0"
         self.stored_port ="22125"
+        self.stored_tls :bool = True
         self.read_cache()
 
         # def format_ip(event=None):
@@ -236,7 +251,7 @@ class client_gui:
         #         if len(current_text.replace('.', '')) % 3 == 0 and current_text[-1] != '.':
         #             self.ip_entry.insert(tk.END, '.')
 
-        # Register validation function for ip
+        # Register validation function for port
         vcmd_port = (self.root.register(self.validate_port), '%P')
 
         self.port_label = tk.Label(self.c_frame, text="Device port:")
@@ -263,6 +278,10 @@ class client_gui:
             font=('Arial', 12))
         self.ip_entry.grid(column=2,row=1)
         self.ip_entry.insert(-1,self.stored_ip)
+
+        self.tls_var = tk.BooleanVar(value=self.stored_tls)
+        self.tls_check_box = tk.Checkbutton(self.c_frame, text='TLS',variable=self.tls_var, onvalue=True, offvalue=False, command=self.update_cache_tls)
+        self.tls_check_box.grid(column=2,row=4)
 
         """ CACHE NETWORK """
 

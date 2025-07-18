@@ -1,16 +1,11 @@
 import threading
-import time
 import os
 import server
 import client
-import socket
 import oslp.envelope as envelope
 import oslp.message as message
 import oslp.device as device
 from oslp.types import OslpRequestType
-import gui
-from tkinter import ttk
-import tkinter as tk
 import random
 import ssl
 import crypto
@@ -19,18 +14,18 @@ import oslp.oslp_pb2 as oslp_pb2 #import the generated protobuf module
 from google.protobuf.json_format import MessageToJson, Parse
 from queue import Queue
 import client_gui
+import server_gui
+import logging
 
 class protocol:
-    def __init__(self,s_ip: str, s_port: int, c_ip: str, c_port: int, tls: bool, root):
+    def __init__(self,root):
         self.root = root
         self.root.geometry("800x600")
         self.root.title("OSLP Simulator")
         self.queue = Queue()
-        self.s_ip=s_ip
-        self.s_port=s_port
-
-        cwd = os.getcwd()
-
+        self.logger = logging.getLogger('oslp traffic')
+        logging.basicConfig(format = '[%(asctime)s] %(message)s', handlers=[logging.FileHandler('traffic_oslp.log'),
+            logging.StreamHandler()],  level=logging.DEBUG) #encoding='utf-8', filename='traffic_oslp.log',
         # self.PRIVATE_KEY = os.getenv("PRIVATE_KEY")
         # self.PUBLIC_KEY = os.getenv("PUBLIC_KEY")
         # print(self.PRIVATE_KEY)
@@ -39,18 +34,17 @@ class protocol:
         self.root.bind("<<CheckQueue>>", self.handle_queue)
 
         self.retrieveKey()
-        self.tls = tls
         self.dev = device.device(crypto.load_key(os.getenv("PUBLIC_KEY"), public=True))
 
-        self.server = server.server(self.server_handler,self.s_ip,self.s_port,self.tls,self.queue,self.root)
+        self.server = server.server(self.server_handler,self.queue,self.root)
         # self.server = None
 
         # self.server_thread = threading.Thread(target=self.server.start, name='server_handler')
         self.server_thread : threading.Thread = None
 
-        self.client=client.client(self.prepareRequest,envelope.messageValidator,self.handleResponse,self.dev.setSequenceNumber,c_ip,c_port,self.tls,self.queue,self.root)
+        self.client=client.client(self.prepareRequest,envelope.messageValidator,self.handleResponse,self.dev.setSequenceNumber,self.queue,self.root)
 
-        self.server_gui()
+        self.server_states=server_gui.server_gui(self.root,self.start_server,self.stop_server)
         self.client_states=client_gui.client_gui(self.root,self.start_client)
 
 
@@ -61,13 +55,12 @@ class protocol:
         msg()
 
     def start_client(self):
-        self.client.start(self.client_states.ip_entry.get(),int(self.client_states.port_entry.get()))
+        self.client.start(self.client_states.ip_entry.get(),int(self.client_states.port_entry.get()),self.client_states.tls_var.get())
 
     def start_server(self):
 
         if self.server_thread is None or not self.server_thread.is_alive():
-            # self.server = server.server(self.server_handler,self.s_ip,self.s_port,self.tls,self.queue,self.root)
-            self.server_thread = threading.Thread(target=self.server.start, name='server_handler')    
+            self.server_thread = threading.Thread(target=self.server.start, args=(int(self.server_states.port_entry.get()),self.server_states.tls_var.get()), name='server_handler')    
             self.server_thread.start()
             print("Server started")
         else:
@@ -96,24 +89,27 @@ class protocol:
         self.privateKey = crypto.load_key(os.getenv("PRIVATE_KEY"), public=False)
 
     def prepareRequest(self) -> envelope.envelope:
-        request_payload = message.prepareMessageType(self.client_states)
+        request_payload, remaining_msg_parts = message.prepareMessageType(self.client_states)
+        next_sequence = self.dev.getNextSequenceNumber()
+        self.logger.debug("[GXF] [%d]\n%s",next_sequence,request_payload)
         request = envelope.envelope(self.dev.getNextSequenceNumberBytes(),self.dev.getDeviceID(),request_payload,privateKey=self.privateKey)
-        return (request.encode(),self.dev.getNextSequenceNumber())
+        return (request.encode(),next_sequence,remaining_msg_parts)
 
     def handleRequest(self,data):
         request = envelope.envelope.decode(data)
-        print("Received request:")
-        print(request.payload)
+        # print("Received request:")
+        sequence_number = int.from_bytes(request.sequenceNumber, byteorder='big', signed=False)
+        self.logger.debug("[DEV] [%d]\n%s",sequence_number,request.payload)
 
         self.validateMessage(request)
-        response_payload, increment_sequence  = message.checkRequest(request.deviceId,int.from_bytes(request.sequenceNumber, byteorder='big', signed=False),request.payload,self.dev)
+        response_payload, increment_sequence  = message.checkRequest(request.deviceId,sequence_number,request.payload,self.dev)
 
         # does this message require sequence increment
         new_success_sequence = self.dev.getNextSequenceNumber() if increment_sequence else self.dev.getSequenceNumber()
         new_success_sequence_bytes = self.dev.getNextSequenceNumberBytes() if increment_sequence else self.dev.getSequenceNumberBytes()           
+        # print("Prepared response:")
+        self.logger.debug("[GXF] [%d]\n%s",new_success_sequence,response_payload)
 
-        print("Prepared response:")
-        print(response_payload)
         # mirror device id
         response = envelope.envelope(new_success_sequence_bytes,request.deviceId,response_payload,privateKey=self.privateKey)
         return (response.encode(),new_success_sequence)
@@ -121,7 +117,9 @@ class protocol:
     def handleResponse(self,data):
         response = envelope.envelope.decode(data)
         self.validateMessage(response)
-        message.checkResponse(response.deviceId,int.from_bytes(response.sequenceNumber, byteorder='big', signed=False),response.payload,self.dev)
+        sequence_number = int.from_bytes(response.sequenceNumber, byteorder='big', signed=False)
+        self.logger.debug("[DEV] [%d]\n%s",sequence_number,response.payload)
+        message.checkResponse(response.deviceId,sequence_number,response.payload,self.dev)
 
     def validateMessage(self,env:envelope.envelope) -> bool:
         if env.validate(self.dev.publicKey):
@@ -129,7 +127,7 @@ class protocol:
         else:
             raise Exception("Not valid message signature")
 
-    def server_handler(self,client_socket:ssl.SSLSocket=None):
+    def server_handler(self,client_socket:ssl.SSLSocket,tls:bool):
         buffer = bytearray(4096)  # Create preallocated to store received data
         offset = 0
         with client_socket:
@@ -138,7 +136,7 @@ class protocol:
                 while True:
                     # Receive the response from the client
                     bytes_received = client_socket.recv_into(memoryview(buffer)[offset:])
-                    print(f"bytes received {bytes_received}",) 
+                    # print(f"bytes received {bytes_received}",) 
                     if bytes_received == 0:
                         break
                     offset += bytes_received
@@ -155,7 +153,7 @@ class protocol:
                 print(f"Error: {e}")
             finally:
                 print("Connection closed")
-                if self.tls:
+                if tls:
                     client_socket.unwrap() # Sends TLS close_notify, converts socket to plaintext
 
                 # It disables further sends and receives on the socket, but does not close the socket yet. 
@@ -169,34 +167,6 @@ class protocol:
         # for n in [0,1,2,3]:
         #     print(n)
         #     time.sleep(1)
-
-    def server_gui(self):
-        self.s_frame = ttk.LabelFrame(self.root, text="Server")
-        self.s_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        
-        # def validate_ip(new_text):
-        #    return (new_text.isdigit() and len(new_text) <= 14) or new_text==""
-
-        # # Register the validation function
-        # validate_server_ip = self.root.register(validate_ip)
-
-        # self.server_ip = tk.Entry(self.c_frame,validate="key", validatecommand=(validate_server_ip, '%P'), width=16)
-
-        # self.label = ttk.Label(self.s_frame, text="Counter from Thread 2: 0")
-        # self.label.pack(pady=10)
-        
-        self.startButton = ttk.Button(self.s_frame, text="Start server", command=self.start_server)
-        # self.startButton.pack(pady=10)
-        self.startButton.grid(column=0,row=0,columnspan=3)
-
-        #TODO: find a way to start and stop server
-        self.stopButton = ttk.Button(self.s_frame, text="Stop server", command=self.stop_server)
-        self.stopButton.grid(column=0,row=1,columnspan=2)
-
-
-        
-
-
 
 def protobuf_ver():
     print("protobuf v"+google.protobuf.__version__)
