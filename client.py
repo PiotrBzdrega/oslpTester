@@ -80,27 +80,32 @@ class client:
             
     def exchange(self,socket:ssl.SSLSocket,tls):
         buffer = bytearray(4096)  # Create preallocated to store received data
-        offset = 0
+        drop_remaining_parts:bool = True
         try:
             while True:
-                raw_request, sequence_number, remaining_parts = self.prepare_request_handler()
+                offset = 0
+                raw_request, sequence_number, remaining_parts = self.prepare_request_handler(drop_remaining_parts)
                 socket.sendall(raw_request)
                 # set a new sequence number if the data has been delivered
                 self.set_sequence_number(sequence_number)
                 while True:
                     # Receive the response from the server
                     bytes_received = socket.recv_into(memoryview(buffer)[offset:])
-                    # print(f"{bytes_received} bytes received from Server") 
+                    print(f"{bytes_received} bytes received from Server") 
                     if bytes_received == 0:
                         break
                     offset += bytes_received
                     if self.msg_validator(buffer[:offset]):
-                        self.response_handler(buffer[:offset])
+                        print("Correct response validator") 
+                        status = self.response_handler(buffer[:offset])
                         break
                 
-                if not remaining_parts:
-                    # All parts has been send
+                if not remaining_parts or not status:
+                    # All parts has been send or Failure/Rejected status received
                     break
+                else:
+                    # continue fetching parial messages during next calls
+                    drop_remaining_parts = False
 
         except ssl.SSLError as e:
             print(f"SSL error: {e}")

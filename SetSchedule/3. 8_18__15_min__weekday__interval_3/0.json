@@ -201,28 +201,6 @@
         {
             "weekday": "WEEKDAY",
             "actionTime": "ABSOLUTETIME",
-            "time": "160000",
-            "value": [
-                {
-                    "index": "Aw==",
-                    "on": true
-                }
-            ]
-        },
-        {
-            "weekday": "WEEKDAY",
-            "actionTime": "ABSOLUTETIME",
-            "time": "161500",
-            "value": [
-                {
-                    "index": "Aw==",
-                    "on": false
-                }
-            ]
-        },
-        {
-            "weekday": "WEEKDAY",
-            "actionTime": "ABSOLUTETIME",
             "time": "170000",
             "value": [
                 {

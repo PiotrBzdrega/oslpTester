@@ -17,6 +17,7 @@ class client_gui:
         onlydir = [dir for dir in os.listdir(schedules_path) if os.path.isdir(os.path.join(schedules_path, dir))]
         # print(schedules_path)
         # print(onlydir)
+        onlydir.sort()
         return onlydir
     
     @staticmethod
@@ -29,6 +30,7 @@ class client_gui:
             if os.path.isfile(os.path.join(schedules_path, filename) ) and os.path.splitext(os.path.join(schedules_path, filename))[1].lower() == ".json" # second element holds the file extension
             ]
         # print(onlyfile)
+        onlyfile.sort()
         return onlyfile
 
     def update_option_context(self,selected_value):
@@ -124,6 +126,7 @@ class client_gui:
             # case OslpRequestType.getStatusRequest:
             # case OslpRequestType.getConfigurationRequest:
             # case OslpRequestType.setRebootRequest:
+            # case OslpRequestType.getFirmwareVersionResponse 
             # do nix
 
     def read_cache(self):

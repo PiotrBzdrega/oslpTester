@@ -12,6 +12,7 @@ class OslpRequestType(StrEnum):
     setTransitionRequest = "setTransitionRequest"
     getConfigurationRequest = "getConfigurationRequest"
     setConfigurationRequest = "setConfigurationRequest"
+    getFirmwareVersionRequest = "getFirmwareVersionRequest"
 
 class OslpTransitionType(StrEnum):
     night_day = "night_day"

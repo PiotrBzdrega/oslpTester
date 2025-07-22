@@ -88,8 +88,8 @@ class protocol:
     def retrieveKey(self):
         self.privateKey = crypto.load_key(os.getenv("PRIVATE_KEY"), public=False)
 
-    def prepareRequest(self) -> envelope.envelope:
-        request_payload, remaining_msg_parts = message.prepareMessageType(self.client_states)
+    def prepareRequest(self,drop_remaining:bool) -> envelope.envelope:
+        request_payload, remaining_msg_parts = message.prepareMessageType(self.client_states,drop_remaining)
         next_sequence = self.dev.getNextSequenceNumber()
         self.logger.debug("[GXF] [%d]\n%s",next_sequence,request_payload)
         request = envelope.envelope(self.dev.getNextSequenceNumberBytes(),self.dev.getDeviceID(),request_payload,privateKey=self.privateKey)
@@ -102,7 +102,7 @@ class protocol:
         self.logger.debug("[DEV] [%d]\n%s",sequence_number,request.payload)
 
         self.validateMessage(request)
-        response_payload, increment_sequence  = message.checkRequest(request.deviceId,sequence_number,request.payload,self.dev)
+        response_payload, increment_sequence  = message.checkRequest(request.deviceId,sequence_number,request.payload,self.dev, self.server_states)
 
         # does this message require sequence increment
         new_success_sequence = self.dev.getNextSequenceNumber() if increment_sequence else self.dev.getSequenceNumber()
@@ -119,7 +119,7 @@ class protocol:
         self.validateMessage(response)
         sequence_number = int.from_bytes(response.sequenceNumber, byteorder='big', signed=False)
         self.logger.debug("[DEV] [%d]\n%s",sequence_number,response.payload)
-        message.checkResponse(response.deviceId,sequence_number,response.payload,self.dev)
+        return message.checkResponse(response.deviceId,sequence_number,response.payload,self.dev)
 
     def validateMessage(self,env:envelope.envelope) -> bool:
         if env.validate(self.dev.publicKey):
