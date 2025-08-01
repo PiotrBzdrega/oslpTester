@@ -5,5 +5,6 @@ keys/
 certs/
 client_net_cache.json
 server_net_cache.json
+ssh_cache.json
 oslp_cache.json
 *.log

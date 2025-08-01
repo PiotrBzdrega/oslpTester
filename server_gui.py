@@ -173,6 +173,9 @@ class server_gui:
         # self.stopButton.grid(column=0,row=1,columnspan=2)
         # self.stopButton.grid_forget()
 
+        self.stored_latitude = "52240000"
+        self.stored_longitude ="16560000"
+        self.stored_timeoffset = "60"
         self.stored_port ="12123"
         self.stored_tls :bool = True
         self.read_cache()
