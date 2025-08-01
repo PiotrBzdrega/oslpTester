@@ -65,7 +65,7 @@ def prepareMessageType(client_states:client_gui.client_gui, drop_remaining : boo
 
             case OslpRequestType.setEventNotificationsRequest:
                 msg.setEventNotificationsRequest.CopyFrom(oslp_pb2.SetEventNotificationsRequest())
-                msg.setEventNotificationsRequest.NotificationMask = 255
+                msg.setEventNotificationsRequest.NotificationMask = int(client_states.event_mask.get())
             case OslpRequestType.setScheduleRequest:
                 dir=client_states.schedule_dir.get()
                 partial_schedule = client_states.list_dir_json_files("SetSchedule",dir)
@@ -94,7 +94,7 @@ def prepareMessageType(client_states:client_gui.client_gui, drop_remaining : boo
             case OslpRequestType.setConfigurationRequest:
                 configuration = oslp_pb2.SetConfigurationRequest()
 
-                with open(client_states.configuration_dir.get(), "r") as f:
+                with open(client_states.setconfiguration_dir.get(), "r") as f:
                     json_set_configuration = f.read()
                     # Parse JSON into the Protobuf message
                     Parse(json_set_configuration, configuration)
@@ -146,6 +146,8 @@ def checkResponse(device_uid,sequence_number,payload ,dev:device.device):
         status =  payload.setTransitionResponse.status
     elif payload.HasField("getConfigurationResponse"):
         status =  payload.getConfigurationResponse.status
+    elif payload.HasField("setConfigurationResponse"):
+        status =  payload.setConfigurationResponse.status
     elif payload.HasField("getFirmwareVersionResponse"):
         # this msg does not have Status field
         status = oslp_pb2.Status.OK

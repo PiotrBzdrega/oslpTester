@@ -1,11 +1,14 @@
 import oslp.protocol as protocol
-import gui
 import test
 import tkinter as tk
 import os
 from signal import signal, SIGPIPE, SIG_IGN
+# import ssh
 
 if __name__ == "__main__":
+
+    # ssh.connect()
+    # exit(1)
 
     signal(SIGPIPE,SIG_IGN)
 
