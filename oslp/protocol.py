@@ -90,10 +90,10 @@ class protocol:
 
     def prepareRequest(self,drop_remaining:bool) -> envelope.envelope:
         request_payload, remaining_msg_parts = message.prepareMessageType(self.client_states,drop_remaining)
-        next_sequence = self.dev.getNextSequenceNumber()
-        self.logger.debug("[GXF] [%d]\n%s",next_sequence,request_payload)
-        request = envelope.envelope(self.dev.getNextSequenceNumberBytes(),self.dev.getDeviceID(),request_payload,privateKey=self.privateKey)
-        return (request.encode(),next_sequence,remaining_msg_parts)
+        current_sequence = self.dev.getSequenceNumber()
+        self.logger.debug("[GXF] [%d]\n%s",current_sequence,request_payload)
+        request = envelope.envelope(self.dev.getSequenceNumberBytes(),self.dev.getDeviceID(),request_payload,privateKey=self.privateKey)
+        return (request.encode(),current_sequence,remaining_msg_parts)
 
     def handleRequest(self,data):
         request = envelope.envelope.decode(data)

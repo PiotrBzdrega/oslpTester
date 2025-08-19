@@ -104,14 +104,18 @@ class device:
         if expect_sequence_number > MAX_SEQUENCE_NUMBER:
             expect_sequence_number = 0
         
-        diff = abs(expect_sequence_number-sequence_number)
-        if diff > SEQUENCE_WINDOW:
-            if diff <= (MAX_SEQUENCE_NUMBER - SEQUENCE_WINDOW):
-                print(f'Wrong sequence number. Should be {expect_sequence_number} +/-{SEQUENCE_WINDOW}, received {sequence_number}')
-                return False 
-
-        return True          
-                   
+        # TODO: choose valid sequence Window not hardcoded
+        last_expect_sequence_number = expect_sequence_number + SEQUENCE_WINDOW
+        
+        if expect_sequence_number <= last_expect_sequence_number:
+            if expect_sequence_number <= sequence_number and sequence_number <= last_expect_sequence_number:
+                return True
+        else:
+            if expect_sequence_number <= sequence_number or sequence_number <= last_expect_sequence_number:
+                return True
+        
+        print(f'Wrong sequence number. Should be {expect_sequence_number} +{SEQUENCE_WINDOW}, received {sequence_number}')
+        return False          
 
     def checkDeviceAndPlatformRandom(self,device_random,platform_random):
         if self.randomDevice != device_random :

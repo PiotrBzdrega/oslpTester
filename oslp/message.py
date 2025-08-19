@@ -170,7 +170,8 @@ def checkRequest(device_uid,sequence_number,payload,dev, server_states:server_gu
         return (handleConfirmRegisterDeviceRequest(device_uid,sequence_number,payload.confirmRegisterDeviceRequest,dev),False)
     elif payload.HasField("eventNotificationRequest"):
         # Only sequece number for EventNotificationsRequest should be incremented
-        return (handleEventNotificationsRequest(device_uid,sequence_number,payload.eventNotificationRequest,dev),True)
+        # update: seems none message sequence number should be incremented 
+        return (handleEventNotificationsRequest(device_uid,sequence_number,payload.eventNotificationRequest,dev),False)
     else:
         raise Exception(f"Not correct message type {checkRequest.__name__}") 
 
