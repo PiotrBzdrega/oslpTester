@@ -20,7 +20,7 @@ import logging
 class protocol:
     def __init__(self,root):
         self.root = root
-        self.root.geometry("800x600")
+        self.root.geometry("1000x500")
         self.root.title("OSLP Simulator")
         self.queue = Queue()
         self.logger = logging.getLogger('oslp traffic')
@@ -47,6 +47,11 @@ class protocol:
         self.server_states=server_gui.server_gui(self.root,self.start_server,self.stop_server)
         self.client_states=client_gui.client_gui(self.root,self.start_client)
 
+        # # Don't forget to configure grid weights for resizing!
+        # self.root.grid_columnconfigure(0, weight=1)
+        # self.root.grid_columnconfigure(1, weight=1)
+        # self.root.grid_rowconfigure(0, weight=1)
+        # self.root.grid_rowconfigure(1, weight=1)
 
     def handle_queue(self,event):
         

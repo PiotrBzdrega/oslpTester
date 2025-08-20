@@ -3,7 +3,7 @@ import test
 import tkinter as tk
 import os
 from signal import signal, SIGPIPE, SIG_IGN
-# import ssh
+import ssh
 
 if __name__ == "__main__":
 
@@ -24,6 +24,10 @@ if __name__ == "__main__":
     os.environ["CLIENT_NET_CACHE"] = os.path.join(app_root,"client_net_cache.json") # file to store last used ip and port
     os.environ["SERVER_NET_CACHE"] = os.path.join(app_root,"server_net_cache.json") # file to store last used port
     os.environ["OSLP_CACHE"] = os.path.join(app_root,"oslp_cache.json") # file to store oslp registration details
+
+    # # avoid fabric and invoke debug logs
+    # os.environ['INVOKE_DEBUG'] = '0'
+    # os.environ['FABRIC_DEBUG'] = '0'
 
     testing = False
     if testing:

@@ -164,6 +164,7 @@ class server_gui:
     def init_fields(self):
         self.s_frame = tk.LabelFrame(self.root, text="Server")
         self.s_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+        # self.s_frame.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
                 
         self.startButton = tk.Button(self.s_frame, bg="green", activebackground="lightgreen", text="Start server", command=self.start)
         # self.startButton.pack(pady=10)

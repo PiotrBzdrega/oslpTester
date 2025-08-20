@@ -4,6 +4,7 @@ from oslp.types import *
 import os
 import json
 import ipaddress
+import ssh
 
 class client_gui:
     def __init__(self,root,client_request):
@@ -216,9 +217,29 @@ class client_gui:
             self.update_cache_ip(new_text)
         return True
 
+    def setRemoteTime(self):
+        formatted_cmd = f"su -c 'date -s \"{self.get_set_time_entry.get()}\"'"
+        ssh.connect_root(self.ssh_user_entry.get(),self.ssh_user_password_entry.get(),self.root_password_entry.get(),self.ip_entry.get(),formatted_cmd)
+
+    def getRemoteTime(self):
+        cmd = 'date +"%Y-%m-%d %H:%M:%S"'
+        result = ssh.connect(self.ssh_user_entry.get(),self.ssh_user_password_entry.get(),self.ip_entry.get(),cmd)
+        self.get_set_time_entry.delete(0, tk.END)
+        if result:
+            # print(result)
+            self.get_set_time_entry.insert(-1,result[:19])
+        else:
+            self.get_set_time_entry.insert(-1,"Wrong DateTime")
+
+    def read_system_local_time(self):
+        local_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.get_set_time_entry.delete(0, tk.END)
+        self.get_set_time_entry.insert(-1,local_now) 
+
     def init_fields(self):
         self.c_frame = tk.LabelFrame(self.root, text="Client")
         self.c_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+        # self.c_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky='nsew')
         # self.c_frame.grid()
         # self.c_label = tk.Label(self.c_frame, text="Counter from Thread 1: 0")
         # self.c_label.pack(pady=10)
@@ -287,6 +308,66 @@ class client_gui:
         self.tls_check_box.grid(column=2,row=4)
 
         """ CACHE NETWORK """
+
+        """ TIME """
+        self.get_set_time_label = tk.Label(self.c_frame, text="Get/Set Time:")
+        self.get_set_time_label.grid(column=3,row=0)
+        self.get_set_time_entry = tk.Entry(
+            self.c_frame,
+            # validate="key", # Validate on every keystroke
+            # validatecommand=vcmd_ip,
+            width=19,
+            font=('Arial', 12))
+        self.get_set_time_entry.grid(column=3,row=1)
+                    
+        self.read_system_local_time()
+        
+        #  bg="yellow", activebackground="lightyellow", 
+        self.set_time_button = tk.Button(self.c_frame, text="Set Remote Time", command=self.setRemoteTime)
+        self.set_time_button.grid(column=3,row=2)
+        
+        self.get_time_button = tk.Button(self.c_frame, text="Get Remote Time", command=self.getRemoteTime)
+        self.get_time_button.grid(column=3,row=3) 
+
+        self.read_system_time_button = tk.Button(self.c_frame, text="Read System Time", command=self.read_system_local_time)
+        self.read_system_time_button.grid(column=3,row=4)
+
+        # ssh user
+        self.ssh_user_label = tk.Label(self.c_frame, text="ssh user")
+        self.ssh_user_label.grid(column=3,row=5)
+        self.ssh_user_entry = tk.Entry(
+            self.c_frame,
+            # validate="key", # Validate on every keystroke
+            # validatecommand=vcmd_ip,
+            width=19,
+            font=('Arial', 12))
+        self.ssh_user_entry.grid(column=3,row=6)
+        
+        # ssh user password
+        self.ssh_user_password_label = tk.Label(self.c_frame, text="ssh user password")
+        self.ssh_user_password_label.grid(column=4,row=5)
+        self.ssh_user_password_entry = tk.Entry(
+            self.c_frame, 
+            show="*",
+            # validate="key", # Validate on every keystroke
+            # validatecommand=vcmd_ip,
+            width=19,
+            font=('Arial', 12))
+        self.ssh_user_password_entry.grid(column=4,row=6)
+
+        # root password
+        self.root_password_label = tk.Label(self.c_frame, text="root password")
+        self.root_password_label.grid(column=3,row=7)
+        self.root_password_entry = tk.Entry(
+            self.c_frame, 
+            show="*",
+            # validate="key", # Validate on every keystroke
+            # validatecommand=vcmd_ip,
+            width=19,
+            font=('Arial', 12))
+        self.root_password_entry.grid(column=3,row=8)
+
+        """ TIME """
 
         """ SET TRANSITION """
         def validate_transition(new_text):
