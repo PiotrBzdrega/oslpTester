@@ -46,6 +46,18 @@ nc -v localhost 12123
 deactivate
 ```
 
+## WINDOWS
+```shell
+install python (make sure tkinter is there)
+C:\_topics\oslpTester\.venv\Scripts\activate
+pip3 install protobuf==6.31.1
+pip3 install cryptography
+pip3 install paramiko
+pip3 install fabric
+```
+
+
+
 ### TODO:
 * add TLS checkbox for client and server independently
 * customized port for server
