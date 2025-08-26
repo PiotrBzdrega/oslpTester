@@ -112,7 +112,9 @@ def prepareMessageType(client_states:client_gui.client_gui, drop_remaining : boo
 
                 # Specify time if field not empty
                 if client_states.time.get():
-                    msg.setTransitionRequest.time = client_states.time.get()
+                    # msg.setTransitionRequest.time = client_states.time.get()
+                    text = client_states.time.get()
+                    msg.setTransitionRequest.time = ''.join(char for char in text if char.isdigit())
                 # .. otherwise send without time -> device will take now
                 # msg.setTransitionRequest.time = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
             

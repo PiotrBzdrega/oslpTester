@@ -371,16 +371,18 @@ class client_gui:
 
         """ SET TRANSITION """
         def validate_transition(new_text):
-           return (new_text.isdigit() and len(new_text) <= 14) or new_text==""
+        #    return (new_text.isdigit() and len(new_text) <= 14) or new_text==""
+           return len(new_text) <= 19 or new_text==""
+        
 
         # Register the validation function
         validate_cmd = self.root.register(validate_transition)
 
-        self.time_label = tk.Label(self.c_frame, text="transitionTime")
+        self.time_label = tk.Label(self.c_frame, text="UTC transitionTime (leave empty to cause 'now' on device)")
         # self.time_label.pack(pady=10)
 
-        self.time = tk.Entry(self.c_frame,validate="key", validatecommand=(validate_cmd, '%P'), width=15)
-        utc_now = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+        self.time = tk.Entry(self.c_frame,validate="key", validatecommand=(validate_cmd, '%P'), width=19)
+        utc_now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         self.time.insert(-1,utc_now)
         # self.time.pack()
 
