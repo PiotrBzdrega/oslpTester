@@ -48,12 +48,18 @@ deactivate
 
 ## WINDOWS
 ```shell
-install python (make sure tkinter is there)
-C:\_topics\oslpTester\.venv\Scripts\activate
+install python (make sure tkinter is already there)
+git clone https://github.com/PiotrBzdrega/oslpTester.git
+cd oslpTester
+### create virtual env
+.venv\Scripts\activate
 pip3 install protobuf==6.31.1
 pip3 install cryptography
 pip3 install paramiko
 pip3 install fabric
+
+### start app
+.venv\Scripts\python.exe main.py
 ```
 
 
