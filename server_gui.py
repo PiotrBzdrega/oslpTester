@@ -127,7 +127,7 @@ class server_gui:
             return True
         try:
             port = int(new_value)
-            if len(new_value)<4:
+            if len(new_value)<5:
                 self.update_cache_timeoffset(new_value)
                 return True
             else:

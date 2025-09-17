@@ -1,0 +1,16 @@
+recipe:
+  - execute:
+      file: reboot.json
+      type: SetRebootRequest
+  - expect:
+      file: registration.json
+      type: RegisterDeviceRequest
+      response:
+        file: registration_response.json
+        type: RegisterDeviceResponse
+  - expect:
+      file: confirm_registration_request.json
+      type: ConfirmRegisterDeviceRequest
+      response:
+        file: confirm_registration_response.json
+        type: ConfirmRegisterDeviceResponse

@@ -4,8 +4,6 @@ import tkinter as tk
 import os
 import platform
 
-import ssh
-
 if __name__ == "__main__":
 
 
@@ -29,6 +27,11 @@ if __name__ == "__main__":
     # # avoid fabric and invoke debug logs
     # os.environ['INVOKE_DEBUG'] = '0'
     # os.environ['FABRIC_DEBUG'] = '0'
+
+    # import yaml_reader
+    
+    # yaml_reader.read()
+    # exit(1)
 
     testing = False
     if testing:

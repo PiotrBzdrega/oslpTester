@@ -28,6 +28,9 @@ protoc --python_out=. oslp.proto
 #make directory keys and certs in oslpTester/
 mkdir keys certs
 
+### start app
+$ ./.venv/bin/python3 main.py
+
 ```
 ### vscode
 ```text

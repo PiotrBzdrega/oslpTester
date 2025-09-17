@@ -228,13 +228,17 @@ class client_gui:
         if result:
             # print(result)
             self.get_set_time_entry.insert(-1,result[:19])
+            self.time.delete(0, tk.END)
+            self.time.insert(-1,result[:19])
         else:
             self.get_set_time_entry.insert(-1,"Wrong DateTime")
 
     def read_system_local_time(self):
         local_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.get_set_time_entry.delete(0, tk.END)
-        self.get_set_time_entry.insert(-1,local_now) 
+        self.get_set_time_entry.insert(-1,local_now)
+        self.time.delete(0, tk.END)
+        self.time.insert(-1,local_now)
 
     def init_fields(self):
         self.c_frame = tk.LabelFrame(self.root, text="Client")
@@ -308,66 +312,6 @@ class client_gui:
         self.tls_check_box.grid(column=2,row=4)
 
         """ CACHE NETWORK """
-
-        """ TIME """
-        self.get_set_time_label = tk.Label(self.c_frame, text="Get/Set Time:")
-        self.get_set_time_label.grid(column=3,row=0)
-        self.get_set_time_entry = tk.Entry(
-            self.c_frame,
-            # validate="key", # Validate on every keystroke
-            # validatecommand=vcmd_ip,
-            width=19,
-            font=('Arial', 12))
-        self.get_set_time_entry.grid(column=3,row=1)
-                    
-        self.read_system_local_time()
-        
-        #  bg="yellow", activebackground="lightyellow", 
-        self.set_time_button = tk.Button(self.c_frame, text="Set Remote Time", command=self.setRemoteTime)
-        self.set_time_button.grid(column=3,row=2)
-        
-        self.get_time_button = tk.Button(self.c_frame, text="Get Remote Time", command=self.getRemoteTime)
-        self.get_time_button.grid(column=3,row=3) 
-
-        self.read_system_time_button = tk.Button(self.c_frame, text="Read System Time", command=self.read_system_local_time)
-        self.read_system_time_button.grid(column=3,row=4)
-
-        # ssh user
-        self.ssh_user_label = tk.Label(self.c_frame, text="ssh user")
-        self.ssh_user_label.grid(column=3,row=5)
-        self.ssh_user_entry = tk.Entry(
-            self.c_frame,
-            # validate="key", # Validate on every keystroke
-            # validatecommand=vcmd_ip,
-            width=19,
-            font=('Arial', 12))
-        self.ssh_user_entry.grid(column=3,row=6)
-        
-        # ssh user password
-        self.ssh_user_password_label = tk.Label(self.c_frame, text="ssh user password")
-        self.ssh_user_password_label.grid(column=4,row=5)
-        self.ssh_user_password_entry = tk.Entry(
-            self.c_frame, 
-            show="*",
-            # validate="key", # Validate on every keystroke
-            # validatecommand=vcmd_ip,
-            width=19,
-            font=('Arial', 12))
-        self.ssh_user_password_entry.grid(column=4,row=6)
-
-        # root password
-        self.root_password_label = tk.Label(self.c_frame, text="root password")
-        self.root_password_label.grid(column=3,row=7)
-        self.root_password_entry = tk.Entry(
-            self.c_frame, 
-            show="*",
-            # validate="key", # Validate on every keystroke
-            # validatecommand=vcmd_ip,
-            width=19,
-            font=('Arial', 12))
-        self.root_password_entry.grid(column=3,row=8)
-
-        """ TIME """
 
         """ SET TRANSITION """
         def validate_transition(new_text):
@@ -463,3 +407,63 @@ class client_gui:
         self.om_setconfiguration = tk.OptionMenu(self.c_frame, self.setconfiguration_dir, *self.om_setconfiguration_options) 
 
         """ SET CONFIGURATION """
+        
+        """ TIME """
+        self.get_set_time_label = tk.Label(self.c_frame, text="Get/Set Time:")
+        self.get_set_time_label.grid(column=3,row=0)
+        self.get_set_time_entry = tk.Entry(
+            self.c_frame,
+            # validate="key", # Validate on every keystroke
+            # validatecommand=vcmd_ip,
+            width=19,
+            font=('Arial', 12))
+        self.get_set_time_entry.grid(column=3,row=1)
+                    
+        self.read_system_local_time()
+        
+        #  bg="yellow", activebackground="lightyellow", 
+        self.set_time_button = tk.Button(self.c_frame, text="Set Remote Time", command=self.setRemoteTime)
+        self.set_time_button.grid(column=3,row=2)
+        
+        self.get_time_button = tk.Button(self.c_frame, text="Get Remote Time", command=self.getRemoteTime)
+        self.get_time_button.grid(column=3,row=3) 
+
+        self.read_system_time_button = tk.Button(self.c_frame, text="Read System Time", command=self.read_system_local_time)
+        self.read_system_time_button.grid(column=3,row=4)
+
+        # ssh user
+        self.ssh_user_label = tk.Label(self.c_frame, text="ssh user")
+        self.ssh_user_label.grid(column=3,row=5)
+        self.ssh_user_entry = tk.Entry(
+            self.c_frame,
+            # validate="key", # Validate on every keystroke
+            # validatecommand=vcmd_ip,
+            width=19,
+            font=('Arial', 12))
+        self.ssh_user_entry.grid(column=3,row=6)
+        
+        # ssh user password
+        self.ssh_user_password_label = tk.Label(self.c_frame, text="ssh user password")
+        self.ssh_user_password_label.grid(column=4,row=5)
+        self.ssh_user_password_entry = tk.Entry(
+            self.c_frame, 
+            show="*",
+            # validate="key", # Validate on every keystroke
+            # validatecommand=vcmd_ip,
+            width=19,
+            font=('Arial', 12))
+        self.ssh_user_password_entry.grid(column=4,row=6)
+
+        # root password
+        self.root_password_label = tk.Label(self.c_frame, text="root password")
+        self.root_password_label.grid(column=3,row=7)
+        self.root_password_entry = tk.Entry(
+            self.c_frame, 
+            show="*",
+            # validate="key", # Validate on every keystroke
+            # validatecommand=vcmd_ip,
+            width=19,
+            font=('Arial', 12))
+        self.root_password_entry.grid(column=3,row=8)
+
+        """ TIME """
