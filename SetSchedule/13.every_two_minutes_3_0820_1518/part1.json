@@ -1,0 +1,560 @@
+{
+    "schedules": [
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "100000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "100200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "100400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "100600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "100800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "101000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "101200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "101400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "101600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "101800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "102000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "102200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "102400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "102600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "102800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "103000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "103200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "103400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "103600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "103800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "104000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "104200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "104400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "104600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "104800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "105000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "105200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "105400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "105600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "105800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "110000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "110200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "110400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "110600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "110800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "111000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "111200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "111400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "111600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "111800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "112000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "112200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "112400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "112600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "112800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "113000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "113200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "113400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "113600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "113800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        }
+    ],
+    "pageInfo": {
+        "currentPage": 2,
+        "pageSize": 50,
+        "totalPages": 5
+    },
+    "scheduleType": "LIGHT"
+}

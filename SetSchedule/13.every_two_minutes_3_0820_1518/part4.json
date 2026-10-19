@@ -1,0 +1,120 @@
+{
+    "schedules": [
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "150000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "150200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "150400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "150600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "150800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "151000",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "151200",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "151400",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "151600",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": true
+                }
+            ]
+        },
+        {
+            "weekday": "ALL",
+            "actionTime": "ABSOLUTETIME",
+            "time": "151800",
+            "value": [
+                {
+                    "index": "Aw==",
+                    "on": false
+                }
+            ]
+        }
+    ],
+    "pageInfo": {
+        "currentPage": 5,
+        "pageSize": 10,
+        "totalPages": 5
+    },
+    "scheduleType": "LIGHT"
+}
